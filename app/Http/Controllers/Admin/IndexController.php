@@ -9,7 +9,30 @@ class IndexController extends Controller
 
     public function index()
     {
-        echo 1234;
+        return view('admin.index.index');
+    }
+
+    public function home()
+    {
+        echo 'home';
+        exit();
+    }
+
+    public function test()
+    {
+        echo 'test';
+        exit();
+    }
+
+    public function test1()
+    {
+        echo 'test1';
+        exit();
+    }
+
+    public function test2()
+    {
+        echo 'test2';
         exit();
     }
 }

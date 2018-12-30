@@ -31,8 +31,8 @@ class AdminAuth
         if (! Admin::checkPower($controllerName, $actionName)) {
             if ($request->ajax()) {
                 return response()->json([
-                    'status' => - 10001,
-                    'message' => '未登陆'
+                    'status' => - 10002,
+                    'message' => '无访问权限'
                 ]);
             }
             return redirect('errors/404');

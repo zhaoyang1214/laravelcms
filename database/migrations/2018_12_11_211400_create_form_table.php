@@ -18,6 +18,9 @@ class CreateFormTable extends Migration
             $table->string('name', 50)->comment('表单名称');
             $table->string('no', 32)->comment('表单编号');
             $table->string('table', 20)->comment('表名');
+            $table->smallInteger('sequence')
+                ->default(0)
+                ->comment('表单排序，升序');
             $table->string('sort', 50)
                 ->default('id DESC')
                 ->comment('内容排序');

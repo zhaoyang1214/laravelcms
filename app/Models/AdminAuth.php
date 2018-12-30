@@ -8,7 +8,8 @@ class AdminAuth extends BaseModel
 
     // 登录后默认的权限
     const LOGGED_DEFAULT_ALLOW = [
-        'Index-index'
+        'Index-index',
+        'Index-home'
     ];
 
     /**

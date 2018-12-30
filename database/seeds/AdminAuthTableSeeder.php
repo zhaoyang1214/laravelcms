@@ -15,7 +15,7 @@ class AdminAuthTableSeeder extends Seeder
         DB::table('admin_auth')->insert([
             [
                 'id' => 1,
-                'name' => '首页',
+                'name' => '首页管理',
                 'controller' => 'Index',
                 'action' => 'home'
             ]

@@ -17,6 +17,9 @@ class CreateExpandTable extends Migration
             $table->smallIncrements('id');
             $table->string('table', 50)->comment('模型表名称');
             $table->string('name', 50)->comment('模型名称');
+            $table->smallInteger('sequence')
+                ->default(0)
+                ->comment('扩展模型排序，升序');
             $table->dateTime('create_time')->comment('创建时间');
             $table->dateTime('update_time')
                 ->nullable()
