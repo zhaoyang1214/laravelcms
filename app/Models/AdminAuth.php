@@ -9,7 +9,8 @@ class AdminAuth extends BaseModel
     // 登录后默认的权限
     const LOGGED_DEFAULT_ALLOW = [
         'Index-index',
-        'Index-home'
+        'Index-home',
+        'Admin-loginOut'
     ];
 
     /**
@@ -26,5 +27,37 @@ class AdminAuth extends BaseModel
             'action' => $actionName,
             'status' => 1
         ]);
+    }
+
+    public static function getAllowList(int $pid = 0, int $depth = null)
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        $query = self::query();
+        if (! ($adminGroupInfo['keep'] & 4)) {
+            if (empty($adminGroupInfo['admin_auth_ids'])) {
+                return [];
+            }
+            $query->whereIn('id', $adminGroupInfo['admin_auth_ids']);
+        }
+        $list = $query->where('status', 1)
+            ->orderBy('sequence')
+            ->get()
+            ->toArray();
+        return self::format($list, $pid, $depth);
+    }
+
+    protected static function format(array $list, int $pid = 0, int $depth = null)
+    {
+        if (! is_null($depth) && $depth == 0) {
+            return [];
+        }
+        $authList = [];
+        foreach ($list as $v) {
+            if ($v['pid'] == $pid) {
+                $v['childs'] = self::format($list, $v['id'], is_null($depth) ? null : $depth - 1);
+                $authList[] = $v;
+            }
+        }
+        return $authList;
     }
 }

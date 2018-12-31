@@ -53,13 +53,11 @@
                         	layer.msg('登录失败');
                         }
             		});
-                	layer.msg('正在登陆...');
+                	layer.msg('正在登陆 . . .', {shade:0.2});
                 	return false;
               });
             });
-        })
-
-        
+        });
     </script>
    
 </body>

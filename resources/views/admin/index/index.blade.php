@@ -24,7 +24,7 @@
         </div>
         <ul class="layui-nav right" lay-filter="">
           <li class="layui-nav-item">
-           <label>欢迎登陆：admin [超级管理]</label>
+           <label>欢迎登陆：{{ $adminInfo['nickname'] }} [{{ $adminInfo['username'] }}]</label>
           </li>
           <li class="layui-nav-item">
            <a href="javascript:loginOut();">退出</a>
@@ -35,7 +35,7 @@
               <dd><a href="javascript:clearCache('0');">清除所有缓存</a></dd>
             </dl>
           </li>
-          <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+          <li class="layui-nav-item to-index"><a href="/" target="_blank">前台首页</a></li>
         </ul>
         
     </div>
@@ -45,118 +45,35 @@
     <div class="left-nav">
       <div id="side-nav">
         <ul id="nav">
-            <li>
+        	@foreach ($authList as $auth)
+        	@if (empty($auth['controller']))
+        	<li>
                 <a href="javascript:;">
-                    <i class="layui-icon layui-icon-home"></i>
-                    <cite>首页管理</cite>
+                    <i class="layui-icon {{ $auth['icon'] }}"></i>
+                    <cite>{{ $auth['name'] }}</cite>
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
                 <ul class="sub-menu">
+                	@foreach ($auth['childs'] as $child)
                     <li>
-                        <a _href="{{ url('admin/index/test') }}">
+                        <a _href="admin/{{ $child['controller'] }}/{{ $child['action'] }}">
                             <i class="iconfont">&#xe6a7;</i>
-                            <cite>系统设置</cite>
+                            <cite>{{ $child['name'] }}</cite>
                             
                         </a>
-                    </li >
-                    <li>
-                        <a _href="{{ url('admin/index/test1') }}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>栏目模型</cite>
-                        </a>
                     </li>
+                    @endforeach
                 </ul>
             </li>
-            <li>
-                <a _href="{{ url('admin/index/test2') }}">
-                    <i class="layui-icon layui-icon-component"></i>
-                    <cite>栏目管理</cite>
+            @else
+        	<li>
+                <a _href="admin/">
+                    <i class="layui-icon {{ $auth['icon'] }}"></i>
+                    <cite>{{ $auth['name'] }}</cite>
                 </a>
             </li>
-            <li>
-                <a _href="">
-                    <i class="layui-icon layui-icon-read"></i>
-                    <cite>内容管理</cite>
-                </a>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="layui-icon layui-icon-senior"></i>
-                    <cite>扩展管理</cite>
-                    <i class="iconfont nav_right">&#xe697;</i>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>扩展模型</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>自定义变量</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>内容替换</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>TAG管理</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>推荐位管理</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="order-list.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>附件管理</cite>
-                        </a>
-                    </li >
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="layui-icon layui-icon-form"></i>
-                    <cite>表单管理</cite>
-                </a>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="layui-icon layui-icon-auz"></i>
-                    <cite>系统管理</cite>
-                    <i class="iconfont nav_right">&#xe697;</i>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a _href="city.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>管理组管理</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="city.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>管理员管理</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="city.html">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>后台登录记录</cite>
-                        </a>
-                    </li >
-                </ul>
-            </li>
+            @endif
+        	@endforeach
         </ul>
       </div>
     </div>
@@ -179,4 +96,13 @@
     <!-- 右侧主体结束 -->
     <!-- 中部结束 -->
 </body>
+<script type="text/javascript">
+function loginOut(){
+	layer.confirm('是否确定退出?', {icon: 3, title:'退出确认', maxWidth:200}, function(index) {
+		window.location.href="{{ url('admin/admin/loginOut') }}";
+		layer.close(index);
+		layer.msg('正在退出 . . .', {shade:0.2});
+	}); 
+}
+</script>
 </html>

@@ -17,7 +17,7 @@ class CreateAdminTable extends Migration
             $table->mediumIncrements('id');
             $table->string('username', 20)->comment('用户名');
             $table->string('password', 32)->comment('密码');
-            $table->string('nicename', 20)
+            $table->string('nickname', 20)
                 ->default('')
                 ->comment('昵称');
             $table->dateTime('regtime')->comment('注册时间');

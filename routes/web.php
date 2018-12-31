@@ -25,8 +25,6 @@ Route::group([
     ], function () {
         Route::get('index/index', 'IndexController@index');
         Route::get('index/home', 'IndexController@home');
-        Route::get('index/test', 'IndexController@test');
-        Route::get('index/test1', 'IndexController@test1');
-        Route::get('index/test2', 'IndexController@test2');
+        Route::get('admin/loginOut', 'AdminController@loginOut');
     });
 });

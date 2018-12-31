@@ -58,11 +58,10 @@ class BaseModel extends Model
      * @param string $boolean            
      * @param bool $cache            
      * @param null|int|\DateInterval $ttl            
-     * @param array $tags            
      * @param array $columns            
      * @return \Illuminate\Database\Eloquent\Model|object|static|null
      */
-    public static function getInfo($column, $operator = null, $value = null, string $boolean = 'and', bool $cache = true, $ttl = 7200, array $tags = [], array $columns = ['*'])
+    public static function getInfo($column, $operator = null, $value = null, string $boolean = 'and', bool $cache = true, $ttl = 7200, array $columns = ['*'])
     {
         if ($cache) {
             $key = self::createCacheKey([
@@ -71,6 +70,7 @@ class BaseModel extends Model
                 __FUNCTION__,
                 $column,
                 $operator,
+                $value,
                 $boolean,
                 $columns
             ]);
@@ -81,5 +81,87 @@ class BaseModel extends Model
         $info = static::query()->where($column, $operator, $value, $boolean)->first($columns);
         Cache::set($key, $info, $ttl);
         return $info;
+    }
+
+    /**
+     * 获取记录数
+     *
+     * @param string|array|\Closure $column            
+     * @param mixed $operator            
+     * @param mixed $value            
+     * @param string $boolean            
+     * @param bool $cache            
+     * @param null|int|\DateInterval $ttl            
+     * @return int
+     */
+    public static function getCount($column, $operator = null, $value = null, string $boolean = 'and', bool $cache = true, $ttl = 7200)
+    {
+        if ($cache) {
+            $key = self::createCacheKey([
+                (new static())->getTable(),
+                static::class,
+                __FUNCTION__,
+                $column,
+                $operator,
+                $value,
+                $boolean
+            ]);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $count = static::query()->where($column, $operator, $value, $boolean)->count();
+        Cache::set($key, $count, $ttl);
+        return $count;
+    }
+
+    /**
+     * 获取多条记录数
+     *
+     * @param string|array|\Closure $column            
+     * @param mixed $operator            
+     * @param mixed $value            
+     * @param string $boolean            
+     * @param int $limit            
+     * @param int $offset            
+     * @param bool $cache            
+     * @param null|int|\DateInterval $ttl            
+     * @param array $columns            
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function getList($column, $operator = null, $value = null, string $boolean = 'and', int $limit = null, int $offset = null, string $orderByColumn = null, string $orderBydirection = 'ASC', bool $cache = true, $ttl = 7200, array $columns = ['*'])
+    {
+        if ($cache) {
+            $key = self::createCacheKey([
+                (new static())->getTable(),
+                static::class,
+                __FUNCTION__,
+                $column,
+                $operator,
+                $value,
+                $boolean,
+                $limit,
+                $offset,
+                $orderByColumn,
+                $orderBydirection,
+                $columns
+            ]);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $query = static::query()->where($column, $operator, $value, $boolean);
+        if (isset($orderByColumn)) {
+            $query = $query->orderBy($orderByColumn, $orderBydirection);
+        }
+        if (isset($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (isset($offset)) {
+            $query = $query->offset($offset);
+        }
+        $list = $query->get($columns);
+        Cache::set($key, $list, $ttl);
+        return $list;
     }
 }

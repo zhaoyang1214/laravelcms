@@ -10,6 +10,12 @@ use App\Models\AdminGroup;
 class AdminController extends Controller
 {
 
+    /**
+     * 登陆
+     *
+     * @param Request $request            
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     */
     public function login(Request $request)
     {
         if ($request->isMethod('post')) {
@@ -68,5 +74,17 @@ class AdminController extends Controller
             ]);
         }
         return view('admin.admin.login');
+    }
+
+    /**
+     * 退出
+     *
+     * @param Request $request            
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public function loginOut(Request $request)
+    {
+        $request->session()->flush();
+        return redirect('admin/admin/login');
     }
 }
