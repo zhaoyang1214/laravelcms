@@ -10,7 +10,8 @@ class AdminAuth extends BaseModel
     const LOGGED_DEFAULT_ALLOW = [
         'Index-index',
         'Index-home',
-        'Admin-loginOut'
+        'Admin-loginOut',
+        'Index-cleanCache'
     ];
 
     /**

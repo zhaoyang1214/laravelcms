@@ -32,7 +32,7 @@
           <li class="layui-nav-item">
             <a href="javascript:;">清除缓存</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
-              <dd><a href="javascript:clearCache('0');">清除所有缓存</a></dd>
+              <dd><a href="javascript:cleanCache('0');">清除所有缓存</a></dd>
             </dl>
           </li>
           <li class="layui-nav-item to-index"><a href="/" target="_blank">前台首页</a></li>
@@ -103,6 +103,22 @@ function loginOut(){
 		layer.close(index);
 		layer.msg('正在退出 . . .', {shade:0.2});
 	}); 
+}
+
+function cleanCache(type){
+	layer.msg('正在清除缓存 . . .', {shade:0.1});
+	$.ajax({
+		type:'post',
+		url:'/admin/index/cleanCache',
+		data:{type:type,_token:'{{csrf_token()}}'},
+		dataType: "json",
+		success: function(data){
+			layer.msg(data.message);
+		},
+        error: function (XMLHttpResponse, textStatus, errorThrown) {
+        	layer.msg('清清除缓存失败');
+        }
+	});
 }
 </script>
 </html>

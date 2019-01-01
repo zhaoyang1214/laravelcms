@@ -20,11 +20,12 @@ Route::group([
 ], function () {
     Route::get('admin/login', 'AdminController@login');
     Route::post('admin/login', 'AdminController@login');
-    Route::group([
-        'middleware' => 'auth.admin'
-    ], function () {
+    Route::middleware([
+        'auth.admin'
+    ])->group(function () {
         Route::get('index/index', 'IndexController@index');
         Route::get('index/home', 'IndexController@home');
         Route::get('admin/loginOut', 'AdminController@loginOut');
+        Route::post('index/cleanCache', 'IndexController@cleanCache');
     });
 });

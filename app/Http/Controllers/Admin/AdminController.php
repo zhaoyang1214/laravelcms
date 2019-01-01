@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Admin;
 use App\Models\AdminGroup;
+use App\Models\AdminLog;
 
 class AdminController extends Controller
 {
@@ -66,7 +67,16 @@ class AdminController extends Controller
             $adminGroupInfo['form_id_arr'] = empty($adminGroupInfo['form_ids']) ? [] : explode(',', $adminGroupInfo['form_ids']);
             session([
                 'adminInfo' => $adminInfo,
-                'adminGroupInfo' => $adminGroupInfo
+                'adminGroupInfo' => $adminGroupInfo,
+                'loginInfo' => [
+                    'loginTime' => date('Y-m-d H:i:s'),
+                    'loginIp' => $request->getClientIp()
+                ]
+            ]);
+            AdminLog::create([
+                'admin_id' => $adminInfo['id'],
+                'logintime' => date('Y-m-d H:i:s'),
+                'ip' => $request->getClientIp()
             ]);
             return response()->json([
                 'status' => 10000,
