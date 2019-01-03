@@ -1,5 +1,50 @@
 @CHARSET "UTF-8";
-.layui-footer{
+
+.layui-footer {
 	text-align: center;
-    color: #AAA;
+	color: #AAA;
+}
+
+.layui-form .input-mini {
+	width: 72px
+}
+
+.layui-form .input-small {
+	width: 90px
+}
+
+.layui-form .input-medium {
+	width: 150px
+}
+
+.layui-form .input-large {
+	width: 210px
+}
+
+.layui-form .input-xlarge {
+	width: 300px
+}
+
+.layui-form .input-xxlarge {
+	width: 540px
+}
+
+.layui-form .form-label-mini {
+	width: 40px;
+}
+
+.layui-form .form-label-small {
+	width: 60px;
+}
+
+.layui-form .form-label-medium {
+	width: 100px;
+}
+
+.layui-form .form-label-large {
+	width: 120px;
+}
+
+.layui-form .form-label-xlarge {
+	width: 140px
 }

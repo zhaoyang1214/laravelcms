@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\AdminAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan;
 
 class IndexController extends Controller
 {
@@ -33,10 +34,29 @@ class IndexController extends Controller
     {
         $type = $request->post('type', 0);
         switch ($type) {
+            case 0:
             case 1:
-                break;
-            default:
-                Cache::flush();
+                Artisan::call('cache:clear');
+                if ($type) {
+                    break;
+                }
+            case 2:
+                Artisan::call('config:clear');
+                if ($type) {
+                    break;
+                }
+            case 3:
+                Artisan::call('route:clear');
+                if ($type) {
+                    break;
+                }
+            case 4:
+                Artisan::call('view:clear');
+                if ($type) {
+                    break;
+                }
+            case 5:
+                Artisan::call('clear-compiled');
         }
         return Response()->json([
             'status' => 10000,

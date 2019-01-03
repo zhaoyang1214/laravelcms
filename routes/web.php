@@ -25,7 +25,9 @@ Route::group([
     ])->group(function () {
         Route::get('index/index', 'IndexController@index');
         Route::get('index/home', 'IndexController@home');
-        Route::get('admin/loginOut', 'AdminController@loginOut');
         Route::post('index/cleanCache', 'IndexController@cleanCache');
+        Route::get('admin/loginOut', 'AdminController@loginOut');
+        Route::get('systemset/index', 'SystemsetController@index');
+        Route::post('systemset/save', 'SystemsetController@save');
     });
 });

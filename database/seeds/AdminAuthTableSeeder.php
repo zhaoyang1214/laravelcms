@@ -182,6 +182,36 @@ class AdminAuthTableSeeder extends Seeder
                 'sequence' => 150,
                 'note' => '后台登录记录',
                 'icon' => ''
+            ],
+            [
+                'id' => 1000,
+                'pid' => 100,
+                'name' => '保存',
+                'controller' => 'systemset',
+                'action' => 'save',
+                'sequence' => 1000,
+                'note' => '系统设置保存',
+                'icon' => ''
+            ],
+            [
+                'id' => 1001,
+                'pid' => 101,
+                'name' => '查看',
+                'controller' => 'categorymodel',
+                'action' => 'info',
+                'sequence' => 1005,
+                'note' => '查看栏目模型详情',
+                'icon' => ''
+            ],
+            [
+                'id' => 1002,
+                'pid' => 101,
+                'name' => '修改',
+                'controller' => 'categorymodel',
+                'action' => 'edit',
+                'sequence' => 1010,
+                'note' => '栏目模型修改',
+                'icon' => ''
             ]
         ]);
     }

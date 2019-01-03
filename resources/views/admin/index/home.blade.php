@@ -60,10 +60,16 @@
                         <td width="35%">v{{ app()::VERSION }}</td>
                     </tr>
                     <tr>
+                        <th>当前环境</th>
+                        <td><font color="@if(env('APP_ENV') == 'production')gree @else red @endif">{{ env('APP_ENV') }}</font></td>
+                        <th>debug状态</th>
+                        <td>@if(env('APP_ENV'))<font  title="开启" color="red">开启</font> @else <font  title="未开启" color="gree">未开启</font> @endif</td>
+                    </tr>
+                    <tr>
                         <th>当前模板</th>
                         <td>default</td>
                         <th>缓存状态</th>
-                        <td><font  title="未开启" color=red>模板</font> <font  title="未开启" color=red>数据</font> <font  title="未开启" color=red>静态</font></td>
+                        <td> @if(config('system.db_cache'))<font  title="开启" color="gree">数据库</font> @else <font  title="未开启" color="red">数据库</font> @endif @if(config('system.view_cache'))<font  title="开启" color="gree">视图</font> @else <font  title="未开启" color="red">视图</font> @endif</td>
                     </tr>
                     <tr>
                         <td>操作系统</td>

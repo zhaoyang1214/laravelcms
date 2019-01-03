@@ -33,6 +33,11 @@
             <a href="javascript:;">清除缓存</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
               <dd><a href="javascript:cleanCache('0');">清除所有缓存</a></dd>
+              <dd><a href="javascript:cleanCache('1');">清除运行缓存</a></dd>
+              <dd><a href="javascript:cleanCache('2');">清除配置缓存</a></dd>
+              <dd><a href="javascript:cleanCache('3');">清除路由缓存</a></dd>
+              <dd><a href="javascript:cleanCache('4');">清除视图模板缓存</a></dd>
+              <dd><a href="javascript:cleanCache('5');">清除compiled</a></dd>
             </dl>
           </li>
           <li class="layui-nav-item to-index"><a href="/" target="_blank">前台首页</a></li>
@@ -56,7 +61,7 @@
                 <ul class="sub-menu">
                 	@foreach ($auth['childs'] as $child)
                     <li>
-                        <a _href="admin/{{ $child['controller'] }}/{{ $child['action'] }}">
+                        <a _href="/admin/{{ $child['controller'] }}/{{ $child['action'] }}">
                             <i class="iconfont">&#xe6a7;</i>
                             <cite>{{ $child['name'] }}</cite>
                             
@@ -116,7 +121,7 @@ function cleanCache(type){
 			layer.msg(data.message);
 		},
         error: function (XMLHttpResponse, textStatus, errorThrown) {
-        	layer.msg('清清除缓存失败');
+        	layer.msg('清除缓存失败');
         }
 	});
 }
