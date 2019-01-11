@@ -91,7 +91,7 @@
                     </tr>
                     <tr>
                         <th>图像处理支持</th>
-                        <td>@if(function_exists('imageline'))<font color=green><b>√</b></font>@else<font color=red><b>×</b></font>@endif</td>
+                        <td>@if(function_exists('gd_info'))<font color=green><b>√</b></font>@else<font color=red><b>×</b></font>@endif</td>
                         <th>脚本运行内存</th>
                         <td>{{ get_cfg_var('memory_limit') }}</td>
                     </tr>

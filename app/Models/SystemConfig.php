@@ -9,4 +9,9 @@ class SystemConfig extends BaseModel
     const CREATED_AT = 'create_time';
 
     const UPDATED_AT = 'update_time';
+
+    protected $fillable = [
+        'name',
+        'value'
+    ];
 }

@@ -15,7 +15,8 @@ class DatabaseSeeder extends Seeder
             AdminAuthTableSeeder::class,
             AdminGroupTableSeeder::class,
             AdminTableSeeder::class,
-            CategoryModelTableSeeder::class
+            CategoryModelTableSeeder::class,
+            SystemConfigSeeder::class
         ]);
     }
 }

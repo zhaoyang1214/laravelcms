@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="{{ asset('admin/css/xadmin.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/css/style.css') }}">
     <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('admin/lib/layui/layui.js') }}" charset="utf-8"></script>
+    <script src="{{ asset('lib/layui/layui.js') }}" charset="utf-8"></script>
     <script type="text/javascript" src="{{ asset('admin/js/xadmin.js') }}"></script>
     @yield('head')
     <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->

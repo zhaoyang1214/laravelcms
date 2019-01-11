@@ -6,11 +6,11 @@
 }
 
 .layui-form .input-mini {
-	width: 72px
+	width: 60px
 }
 
 .layui-form .input-small {
-	width: 90px
+	width: 100px
 }
 
 .layui-form .input-medium {
@@ -18,15 +18,15 @@
 }
 
 .layui-form .input-large {
-	width: 210px
+	width: 220px
 }
 
 .layui-form .input-xlarge {
-	width: 300px
+	width: 320px
 }
 
 .layui-form .input-xxlarge {
-	width: 540px
+	width: 460px
 }
 
 .layui-form .form-label-mini {
