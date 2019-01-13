@@ -14,30 +14,30 @@
                                 <ul class="layui-row layui-col-space10 layui-this">
                                     <li class="layui-col-xs2">
                                         <a href="javascript:;" class="x-admin-backlog-body">
-                                            <h3>栏目书</h3>
+                                            <h3>栏目数</h3>
                                             <p>
-                                                <cite>66</cite></p>
+                                                <cite>{{ $categoryCount }}</cite></p>
                                         </a>
                                     </li>
                                     <li class="layui-col-xs2">
                                         <a href="javascript:;" class="x-admin-backlog-body">
                                             <h3>内容数</h3>
                                             <p>
-                                                <cite>12</cite></p>
+                                                <cite>{{ $contentCount }}</cite></p>
                                         </a>
                                     </li>
                                     <li class="layui-col-xs2">
                                         <a href="javascript:;" class="x-admin-backlog-body">
                                             <h3>TAG数</h3>
                                             <p>
-                                                <cite>99</cite></p>
+                                                <cite>{{ $tagsCount }}</cite></p>
                                         </a>
                                     </li>
                                     <li class="layui-col-xs2">
                                         <a href="javascript:;" class="x-admin-backlog-body">
                                             <h3>附件数</h3>
                                             <p>
-                                                <cite>67</cite></p>
+                                                <cite>{{ $uploadCount }}</cite></p>
                                         </a>
                                     </li>
                                 </ul>

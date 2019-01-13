@@ -7,6 +7,10 @@ use App\Models\AdminAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\Category;
+use App\Models\Content;
+use App\Models\Tags;
+use App\Models\Upload;
 
 class IndexController extends Controller
 {
@@ -25,7 +29,11 @@ class IndexController extends Controller
     {
         $assign = [
             'adminInfo' => session('adminInfo'),
-            'loginInfo' => session('loginInfo')
+            'loginInfo' => session('loginInfo'),
+            'categoryCount' => Category::count(),
+            'contentCount' => Content::count(),
+            'tagsCount' => Tags::count(),
+            'uploadCount' => Upload::count()
         ];
         return view('admin.index.home', $assign);
     }

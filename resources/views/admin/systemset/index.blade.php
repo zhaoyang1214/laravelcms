@@ -1,10 +1,6 @@
 @extends('admin.layouts.common')
 
 @section('content')
-<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
-  <legend>系统设置</legend>
-</fieldset>
-
 <div class="layui-tab layui-tab-brief">
 	<ul class="layui-tab-title">
 		<li class="layui-this">站点设置</li>

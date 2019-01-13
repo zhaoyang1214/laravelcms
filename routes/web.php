@@ -37,5 +37,8 @@ Route::group([
         ], 'ueditor/index', 'UeditorController@index');
         Route::post('ueditor/index', 'UeditorController@index');
         Route::get('ueditor/getUpfileHtml', 'UeditorController@getUpfileHtml');
+        Route::get('categorymodel/index', 'CategorymodelController@index');
+        Route::get('categorymodel/info/{id}', 'CategorymodelController@info')->where('id', '[1-9][0-9]*');
+        Route::post('categorymodel/edit', 'CategorymodelController@edit');
     });
 });
