@@ -40,5 +40,13 @@ Route::group([
         Route::get('categorymodel/index', 'CategorymodelController@index');
         Route::get('categorymodel/info/{id}', 'CategorymodelController@info')->where('id', '[1-9][0-9]*');
         Route::post('categorymodel/edit', 'CategorymodelController@edit');
+        Route::get('admingroup/index', 'AdmingroupController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'admingroup/add', 'AdmingroupController@add');
+        Route::get('admingroup/info/{id}', 'AdmingroupController@info')->where('id', '[1-9][0-9]*');
+        Route::post('admingroup/edit', 'AdmingroupController@edit');
+        Route::post('admingroup/delete', 'AdmingroupController@delete');
     });
 });

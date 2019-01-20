@@ -25,6 +25,10 @@
 	width: 320px
 }
 
+.layui-form .input-xlarge2 {
+	width: 390px
+}
+
 .layui-form .input-xxlarge {
 	width: 460px
 }
@@ -47,4 +51,8 @@
 
 .layui-form .form-label-xlarge {
 	width: 140px
+}
+
+#page {
+	text-align: center;
 }

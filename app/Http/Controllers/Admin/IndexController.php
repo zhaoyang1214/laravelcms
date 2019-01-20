@@ -17,7 +17,7 @@ class IndexController extends Controller
 
     public function index()
     {
-        $authList = AdminAuth::getAllowList(0, 2);
+        $authList = AdminAuth::getAllowListFormat(0, 2);
         $data = [
             'authList' => $authList,
             'adminInfo' => session('adminInfo')

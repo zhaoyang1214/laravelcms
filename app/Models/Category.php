@@ -11,6 +11,7 @@ class Category extends BaseModel
     const UPDATED_AT = 'update_time';
 
     protected $fillable = [
+        'id',
         'pid',
         'category_model_id',
         'sequence',
@@ -29,4 +30,19 @@ class Category extends BaseModel
         'content_order',
         'expand_id'
     ];
+
+    public static function getAllowList()
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        $query = self::query();
+        if (! ($adminGroupInfo['keep'] & 2)) {
+            if (empty($adminGroupInfo['category_ids'])) {
+                return [];
+            }
+            $query->whereIn('id', explode(',', $adminGroupInfo['category_ids']));
+        }
+        return $query->orderBy('sequence')
+            ->get()
+            ->toArray();
+    }
 }

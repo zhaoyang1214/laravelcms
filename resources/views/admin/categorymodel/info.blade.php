@@ -42,7 +42,7 @@
             $.ajax({
     			type:'post',
     			url:'/admin/categorymodel/edit',
-    			data:data.field,
+    			data:requestData,
     			dataType: "json",
     			success: function(data){
     				if(data.status == 10000) {

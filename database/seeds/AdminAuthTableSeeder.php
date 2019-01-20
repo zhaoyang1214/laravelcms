@@ -212,6 +212,96 @@ class AdminAuthTableSeeder extends Seeder
                 'sequence' => 1010,
                 'note' => '栏目模型修改',
                 'icon' => ''
+            ],
+            [
+                'id' => 1003,
+                'pid' => 108,
+                'name' => '添加管理组',
+                'controller' => 'admingroup',
+                'action' => 'add',
+                'sequence' => 1015,
+                'note' => '管理组添加',
+                'icon' => ''
+            ],
+            [
+                'id' => 1004,
+                'pid' => 108,
+                'name' => '查看',
+                'controller' => 'admingroup',
+                'action' => 'info',
+                'sequence' => 1020,
+                'note' => '管理组查看',
+                'icon' => ''
+            ],
+            [
+                'id' => 1005,
+                'pid' => 108,
+                'name' => '修改',
+                'controller' => 'admingroup',
+                'action' => 'edit',
+                'sequence' => 1025,
+                'note' => '管理组修改',
+                'icon' => ''
+            ],
+            [
+                'id' => 1006,
+                'pid' => 108,
+                'name' => '删除',
+                'controller' => 'admingroup',
+                'action' => 'delete',
+                'sequence' => 1030,
+                'note' => '管理组删除',
+                'icon' => ''
+            ],
+            [
+                'id' => 1007,
+                'pid' => 109,
+                'name' => '添加管理员',
+                'controller' => 'admin',
+                'action' => 'add',
+                'sequence' => 1035,
+                'note' => '管理员添加',
+                'icon' => ''
+            ],
+            [
+                'id' => 1008,
+                'pid' => 109,
+                'name' => '查看',
+                'controller' => 'admin',
+                'action' => 'info',
+                'sequence' => 1040,
+                'note' => '管理员查看',
+                'icon' => ''
+            ],
+            [
+                'id' => 1009,
+                'pid' => 109,
+                'name' => '修改',
+                'controller' => 'admin',
+                'action' => 'edit',
+                'sequence' => 1045,
+                'note' => '管理员修改',
+                'icon' => ''
+            ],
+            [
+                'id' => 1010,
+                'pid' => 109,
+                'name' => '删除',
+                'controller' => 'admin',
+                'action' => 'delete',
+                'sequence' => 1050,
+                'note' => '管理员删除',
+                'icon' => ''
+            ],
+            [
+                'id' => 1011,
+                'pid' => 109,
+                'name' => '修改资料',
+                'controller' => 'admin',
+                'action' => 'editInfo',
+                'sequence' => 1055,
+                'note' => '管理员修改资料',
+                'icon' => ''
             ]
         ]);
     }

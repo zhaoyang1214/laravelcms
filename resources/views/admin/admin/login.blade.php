@@ -44,7 +44,7 @@
             			dataType: "json",
             			success: function(data){
             				if(data.status == 10000) {
-                            	location.href='/admin/index/index';
+                            	top.location.href='/admin/index/index';
                             } else {
                            		layer.msg(data.message);
                             }

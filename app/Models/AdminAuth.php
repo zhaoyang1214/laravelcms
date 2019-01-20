@@ -30,7 +30,7 @@ class AdminAuth extends BaseModel
         ]);
     }
 
-    public static function getAllowList(int $pid = 0, int $depth = null)
+    public static function getAllowList()
     {
         $adminGroupInfo = session('adminGroupInfo');
         $query = self::query();
@@ -38,12 +38,17 @@ class AdminAuth extends BaseModel
             if (empty($adminGroupInfo['admin_auth_ids'])) {
                 return [];
             }
-            $query->whereIn('id', $adminGroupInfo['admin_auth_ids']);
+            $query->whereIn('id', explode(',', $adminGroupInfo['admin_auth_ids']));
         }
-        $list = $query->where('status', 1)
+        return $query->where('status', 1)
             ->orderBy('sequence')
             ->get()
             ->toArray();
+    }
+
+    public static function getAllowListFormat(int $pid = 0, int $depth = null)
+    {
+        $list = self::getAllowList();
         return self::format($list, $pid, $depth);
     }
 
