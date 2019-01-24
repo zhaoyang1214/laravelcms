@@ -58,9 +58,6 @@ Route::group([
         Route::post('admin/delete', 'AdminController@delete');
         Route::get('admin/editInfo/{id}', 'AdminController@editInfo')->where('id', '[1-9][0-9]*');
         Route::post('admin/editInfo', 'AdminController@editInfo');
-        // Route::match([
-        // 'get',
-        // 'post'
-        // ], 'admin/editInfo', 'AdminController@editInfo');
+        Route::get('adminlog/index', 'AdminlogController@index');
     });
 });

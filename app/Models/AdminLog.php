@@ -13,4 +13,13 @@ class AdminLog extends BaseModel
         'logintime',
         'ip'
     ];
+
+    public static function getPaginator(int $perPage)
+    {
+        $adminInfo = session('adminInfo');
+        return self::query()->select('logintime', 'ip')
+            ->where('admin_id', $adminInfo['id'])
+            ->orderByDesc('id')
+            ->paginate($perPage);
+    }
 }
