@@ -66,10 +66,7 @@ class AdmingroupController extends Controller
         $adminGroup = new AdminGroup();
         $info = $adminGroup->getOne($id);
         if (! $info) {
-            return response()->json([
-                'status' => 10001,
-                'message' => $adminGroup->getMessages()[0]['message']
-            ]);
+            return redirect('errors/404');
         }
         $allowAdminAuthIdArr = empty($info->admin_auth_ids) ? [] : explode(',', $info->admin_auth_ids);
         $allowCateGoryIdArr = empty($info->category_ids) ? [] : explode(',', $info->category_ids);

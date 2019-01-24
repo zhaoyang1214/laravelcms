@@ -31,6 +31,12 @@ class AdminGroup extends BaseModel
         return self::where('grade', '>=', $adminGroupInfo['grade'])->paginate($perPage);
     }
 
+    public static function getLowerList()
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        return self::where('grade', '>', $adminGroupInfo['grade'])->get();
+    }
+
     public function getOne(int $id)
     {
         $info = self::find($id);

@@ -7,16 +7,13 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Admin;
 use App\Models\AdminGroup;
 use App\Models\AdminLog;
+use App\Http\Requests\Admin\Admin\AddRequest;
+use App\Http\Requests\Admin\Admin\EditRequest;
+use App\Http\Requests\Admin\Admin\EditInfoRequest;
 
 class AdminController extends Controller
 {
 
-    /**
-     * 登陆
-     *
-     * @param Request $request            
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
-     */
     public function login(Request $request)
     {
         if ($request->isMethod('post')) {
@@ -86,15 +83,148 @@ class AdminController extends Controller
         return view('admin.admin.login');
     }
 
-    /**
-     * 退出
-     *
-     * @param Request $request            
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
-     */
     public function loginOut(Request $request)
     {
         $request->session()->flush();
         return redirect('admin/admin/login');
+    }
+
+    public function index()
+    {
+        $data = Admin::getPaginator(10);
+        $admin = new Admin();
+        $adminAddPower = $admin->checkPower('admin', 'add');
+        $adminInfoPower = $admin->checkPower('admin', 'info');
+        $adminDeletePower = $admin->checkPower('admin', 'delete');
+        $adminEditInfoPower = $admin->checkPower('admin', 'editInfo');
+        $adminGroupInfo = session('adminGroupInfo');
+        $adminInfo = session('adminInfo');
+        return view('admin.admin.index', compact('data', 'adminAddPower', 'adminInfoPower', 'adminDeletePower', 'adminEditInfoPower', 'adminGroupInfo', 'adminInfo'));
+    }
+
+    public function add(AddRequest $request)
+    {
+        if ($request->isMethod('post')) {
+            $data = [
+                'username' => $request->post('username'),
+                'password' => md5(md5($request->post('password')) . env('DB_PASSWORD_SALT')),
+                'nickname' => $request->post('nickname'),
+                'regtime' => date('Y-m-d H:i:s'),
+                'status' => $request->post('status'),
+                'admin_group_id' => $request->post('admin_group_id')
+            ];
+            $res = Admin::create($data);
+            if ($res) {
+                return response()->json([
+                    'status' => 10000,
+                    'message' => '添加成功'
+                ]);
+            }
+            return response()->json([
+                'status' => 10001,
+                'message' => '添加失败'
+            ]);
+        }
+        $adminGroupList = AdminGroup::getLowerList();
+        $actionPower = true;
+        $actionName = '添加';
+        $actionUrl = '/admin/admin/add';
+        $action = 'add';
+        return view('admin.admin.info', compact('adminGroupList', 'actionPower', 'actionName', 'actionUrl', 'action'));
+    }
+
+    public function info($id)
+    {
+        $admin = new Admin();
+        $info = $admin->getOne($id);
+        if (! $info) {
+            return redirect('errors/404');
+        }
+        $adminGroupList = AdminGroup::getLowerList();
+        $actionPower = $admin->checkPower('admin', 'edit');
+        $actionName = '修改';
+        $actionUrl = '/admin/admin/edit';
+        $action = 'edit';
+        return view('admin.admin.info', compact('adminGroupList', 'actionPower', 'actionName', 'actionUrl', 'action', 'info'));
+    }
+
+    public function edit(EditRequest $request)
+    {
+        $id = $request->post('id');
+        $data = [
+            'username' => $request->post('username'),
+            'nickname' => $request->post('nickname'),
+            'status' => $request->post('status'),
+            'admin_group_id' => $request->post('admin_group_id')
+        ];
+        if (! empty($request->post('password'))) {
+            $data['password'] = md5(md5($request->post('password')) . env('DB_PASSWORD_SALT'));
+        }
+        $admin = Admin::find($id);
+        $res = $admin->fill($data)->save();
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '修改成功'
+            ]);
+        }
+        return response()->json([
+            'status' => 10001,
+            'message' => '修改失败'
+        ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $admin = new Admin();
+        $info = $admin->getOne($request->post('id', 0));
+        if (! $info) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '该管理员不存在'
+            ]);
+        }
+        $res = $info->delete();
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '删除成功'
+            ]);
+        }
+        return response()->json([
+            'status' => 10001,
+            'message' => '删除失败'
+        ]);
+    }
+
+    public function editInfo(EditInfoRequest $request, $id = null)
+    {
+        if ($request->isMethod('post')) {
+            $id = $request->post('id');
+            $data = [
+                'nickname' => $request->post('nickname')
+            ];
+            if (! empty($request->post('password'))) {
+                $data['password'] = md5(md5($request->post('password')) . env('DB_PASSWORD_SALT'));
+            }
+            $admin = Admin::find($id);
+            $res = $admin->fill($data)->save();
+            if ($res) {
+                return response()->json([
+                    'status' => 10000,
+                    'message' => '修改成功'
+                ]);
+            }
+            return response()->json([
+                'status' => 10001,
+                'message' => '修改失败'
+            ]);
+        }
+        $admin = new Admin();
+        $info = $admin->getOneOrSelf($id);
+        if (! $info) {
+            return redirect('errors/404');
+        }
+        return view('admin.admin.editInfo', compact('info'));
     }
 }

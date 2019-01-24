@@ -3,7 +3,7 @@
 @section('content')
 <div class="x-body">
 	<xblock>
-		<button class="layui-btn" lay-submit="" lay-filter="sreach" onclick="location.reload();">管理组管理</button>
+		<button class="layui-btn" lay-submit="" lay-filter="sreach" onclick="location.href='/admin/admingroup/index';">管理组管理</button>
 		@if($admingroupAddPower)
 		<button class="layui-btn" lay-submit="" lay-filter="sreach" onclick="x_admin_show('添加管理组','/admin/admingroup/add', 900)">管理组添加</button>
 		@endif

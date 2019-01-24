@@ -48,5 +48,19 @@ Route::group([
         Route::get('admingroup/info/{id}', 'AdmingroupController@info')->where('id', '[1-9][0-9]*');
         Route::post('admingroup/edit', 'AdmingroupController@edit');
         Route::post('admingroup/delete', 'AdmingroupController@delete');
+        Route::get('admin/index', 'AdminController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'admin/add', 'AdminController@add');
+        Route::get('admin/info/{id}', 'AdminController@info')->where('id', '[1-9][0-9]*');
+        Route::post('admin/edit', 'AdminController@edit');
+        Route::post('admin/delete', 'AdminController@delete');
+        Route::get('admin/editInfo/{id}', 'AdminController@editInfo')->where('id', '[1-9][0-9]*');
+        Route::post('admin/editInfo', 'AdminController@editInfo');
+        // Route::match([
+        // 'get',
+        // 'post'
+        // ], 'admin/editInfo', 'AdminController@editInfo');
     });
 });

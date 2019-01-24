@@ -13,8 +13,9 @@ class Admin extends BaseModel
     protected $fillable = [
         'username',
         'password',
-        'nicename',
+        'nickname',
         'regtime',
+        'status',
         'admin_group_id'
     ];
 
@@ -73,5 +74,38 @@ class Admin extends BaseModel
         if (! is_null($adminAuthInfo) && in_array($adminAuthInfo->id, $adminGroupInfo['admin_auth_id_arr'])) {
             return true;
         }
+    }
+
+    public static function getPaginator(int $perPage)
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        return self::query()->select('admin.id', 'admin.username', 'admin.nickname', 'admin.regtime', 'admin.status', 'admin_group.name as admin_group_name', 'admin_group.grade')
+            ->leftJoin('admin_group', 'admin.admin_group_id', '=', 'admin_group.id')
+            ->where('grade', '>=', $adminGroupInfo['grade'])
+            ->paginate($perPage);
+    }
+
+    public function getOne(int $id)
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        $query = self::query()->select('admin.*')
+            ->leftJoin('admin_group', 'admin.admin_group_id', '=', 'admin_group.id')
+            ->where('admin.id', $id)
+            ->where('grade', '>', $adminGroupInfo['grade']);
+        return $query->first();
+    }
+
+    public function getOneOrSelf(int $id)
+    {
+        $adminGroupInfo = session('adminGroupInfo');
+        $adminInfo = session('adminInfo');
+        $query = self::query()->select('admin.*')
+            ->leftJoin('admin_group', 'admin.admin_group_id', '=', 'admin_group.id')
+            ->where('admin.id', $id);
+        $query->where(function ($query) use ($adminGroupInfo, $adminInfo) {
+            $query->where('grade', '>', $adminGroupInfo['grade'])
+                ->orWhere('admin.id', $adminInfo['id']);
+        });
+        return $query->first();
     }
 }
