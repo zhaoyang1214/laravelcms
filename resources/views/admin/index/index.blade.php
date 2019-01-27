@@ -72,7 +72,7 @@
             </li>
             @else
         	<li>
-                <a _href="admin/">
+                <a _href="/admin/{{ $auth['controller'] }}/{{ $auth['action'] }}">
                     <i class="layui-icon {{ $auth['icon'] }}"></i>
                     <cite>{{ $auth['name'] }}</cite>
                 </a>

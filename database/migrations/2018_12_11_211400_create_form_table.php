@@ -33,7 +33,7 @@ class CreateFormTable extends Migration
             $table->string('tpl', 50)
                 ->default('')
                 ->comment('前台模板，为空使用默认模板');
-            $table->string('where', 255)
+            $table->string('condition', 255)
                 ->default('')
                 ->comment('前台分页条件');
             $table->tinyInteger('return_type')

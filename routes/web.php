@@ -11,7 +11,7 @@
  * |
  */
 Route::get('/', function () {
-    return view('welcome');
+    echo 'welcome';
 });
 
 Route::group([
@@ -59,5 +59,15 @@ Route::group([
         Route::get('admin/editInfo/{id}', 'AdminController@editInfo')->where('id', '[1-9][0-9]*');
         Route::post('admin/editInfo', 'AdminController@editInfo');
         Route::get('adminlog/index', 'AdminlogController@index');
+        Route::get('form/index', 'FormController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'form/add', 'FormController@add');
+        Route::get('form/info/{id}', 'FormController@info')->where('id', '[1-9][0-9]*');
+        Route::post('form/edit', 'FormController@edit');
+        Route::post('form/delete', 'FormController@delete');
+        Route::get('formfield/index/{formId}', 'FormfieldController@index')->where('formId', '[1-9][0-9]*');
+        Route::get('formdata/index/{formId}', 'FormdataController@index')->where('formId', '[1-9][0-9]*');
     });
 });

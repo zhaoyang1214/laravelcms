@@ -8,7 +8,7 @@
 			<div class="layui-input-inline">
 				<select name="admin_group_id">
 					@foreach($adminGroupList as $adminGroup)
-					<option value="{{ $adminGroup->id }}" @if($info->admin_group_id==$adminGroup->id)selected @endif>{{ $adminGroup->name }}</option>
+					<option value="{{ $adminGroup->id }}" @if(isset($info) && $info->admin_group_id==$adminGroup->id)selected @endif>{{ $adminGroup->name }}</option>
 					@endforeach
 				</select>
 			</div>
