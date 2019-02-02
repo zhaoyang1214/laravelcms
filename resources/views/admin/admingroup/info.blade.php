@@ -24,7 +24,7 @@
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label for="name" class="layui-form-label form-label-large">管理等级</label>
+						<label for="grade" class="layui-form-label form-label-large">管理等级</label>
 						<div class="layui-input-inline">
 							<input type="text" id="grade" name="grade" value="@if(isset($info)){{ $info->grade }}@endif" maxlength="2" placeholder="请填写 {{ $adminGroupInfo['grade'] + 1 }} - 99 之间的整数" lay-verify="number" autocomplete="off" class="layui-input">
 						</div>
@@ -73,7 +73,7 @@
 			</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="L_repass" class="layui-form-label"></label>
+			<label class="layui-form-label"></label>
 			@if($actionPower) 
 				@csrf
 				@if(isset($info)) 

@@ -61,6 +61,7 @@ class CreateExpandFieldTable extends Migration
                 'field',
                 'expand_id'
             ], 'field_expand_id');
+            $table->index('expand_id', 'expand_id');
             $table->index('sequence', 'sequence');
         });
     }

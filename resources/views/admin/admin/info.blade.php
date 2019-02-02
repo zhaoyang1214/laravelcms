@@ -4,7 +4,7 @@
 <div class="x-body">
 	<form class="layui-form">
 		<div class="layui-form-item">
-			<label for="name" class="layui-form-label">管理组</label>
+			<label for="admin_group_id" class="layui-form-label">管理组</label>
 			<div class="layui-input-inline">
 				<select name="admin_group_id">
 					@foreach($adminGroupList as $adminGroup)
@@ -14,27 +14,27 @@
 			</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="name" class="layui-form-label">账号</label>
+			<label for="username" class="layui-form-label">账号</label>
 			<div class="layui-input-inline">
 				<input type="text" id="username" name="username" value="@isset($info){{ $info->username }}@endisset" lay-verify="required" autocomplete="off" class="layui-input">
 			</div>
 			<div class="layui-form-mid layui-word-aux">请输入5-20位数字、字母、 _、@、.</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="name" class="layui-form-label">昵称</label>
+			<label for="nickname" class="layui-form-label">昵称</label>
 			<div class="layui-input-inline">
 				<input type="text" id="nickname" name="nickname" value="@isset($info){{ $info->nickname }}@endisset" lay-verify="required" autocomplete="off" class="layui-input">
 			</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="name" class="layui-form-label">密码</label>
+			<label for="password" class="layui-form-label">密码</label>
 			<div class="layui-input-inline">
 				<input type="password" id="password" name="password" value="" autocomplete="off" class="layui-input">
 			</div>
 			<div class="layui-form-mid layui-word-aux">密码长度为6-20位</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="name" class="layui-form-label">确认密码</label>
+			<label for="password_confirmation" class="layui-form-label">确认密码</label>
 			<div class="layui-input-inline">
 				<input type="password" id="password_confirmation" name="password_confirmation" value="" autocomplete="off" class="layui-input">
 			</div>
@@ -46,7 +46,7 @@
 			</div>
 		</div>
 		<div class="layui-form-item">
-			<label for="L_repass" class="layui-form-label"></label>
+			<label class="layui-form-label"></label>
 			@if($actionPower) 
 				@csrf
 				@if(isset($info)) 

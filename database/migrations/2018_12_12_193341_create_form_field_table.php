@@ -72,6 +72,7 @@ class CreateFormFieldTable extends Migration
                 'field',
                 'form_id'
             ], 'field_form_id');
+            $table->index('form_id', 'form_id');
             $table->index('sequence', 'sequence');
         });
     }
