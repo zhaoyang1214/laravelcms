@@ -6,9 +6,9 @@
 		@if($formIndexPower)
 		<button class="layui-btn" onclick="location.href='/admin/form/index';">表单管理</button>
 		@endif
-		<button class="layui-btn" onclick="location.href='/admin/formfield/index/{{ $formId }}';">表单字段管理</button>
+		<button class="layui-btn" onclick="location.href='/admin/formfield/index/{{ $formInfo->id }}';">{{ $formInfo->name }} - 表单字段管理</button>
 		@if($formfieldAddPower)
-		<button class="layui-btn" onclick="x_admin_show('添加表单字段','/admin/formfield/add/{{ $formId }}', 850)">表单字段添加</button>
+		<button class="layui-btn" onclick="x_admin_show('添加表单字段','/admin/formfield/add/{{ $formInfo->id }}', 850)">{{ $formInfo->name }} - 表单字段添加</button>
 		@endif
 	</xblock>
 	<table class="layui-table">
@@ -30,10 +30,10 @@
 				<td>{{ $loop->iteration }}</td>
 				<td>{{ $data->name }}</td>
 				<td>{{ $data->field }}</td>
-				<td>{{ $data->type }}</td>
-				<td>{{ $data->property }}</td>
+				<td>{{ $formField->getTypeProperty($data->type, false) }}</td>
+				<td>{{ $formField->getTypeProperty($data->type, $data->property) }}</td>
 				<td>{{ $data->sequence }}</td>
-				<td>{{ $data->admin_display }}</td>
+				<td>@if($data->admin_display) 是 @else 否  @endif</td>
 				<td>
 					@if($formfieldInfoPower)
 					<a class="layui-btn layui-btn-normal layui-btn-xs" onclick="x_admin_show('查看表单字段','/admin/formfield/info/{{ $data->id }}', 850)"><i class="layui-icon layui-icon-edit"></i>查看</a>

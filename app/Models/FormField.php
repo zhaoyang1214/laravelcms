@@ -34,7 +34,7 @@ class FormField extends BaseModel
         'admin_display_len'
     ];
 
-    public function getTypeProperty(int $type = null, int $property = null)
+    public function getTypeProperty(int $type = null, $property = null)
     {
         $data = [
             1 => [
@@ -122,13 +122,14 @@ class FormField extends BaseModel
             Schema::table('form_data_' . $form->table, function (Blueprint $table) use ($data) {
                 switch ($data['property']) {
                     case 1:
-                        $table->string($data['field'], $data['len'])->default($data['default']);
+                        $fieldObj = $table->string($data['field'], $data['len']);
+                        if (! $data['is_must']) {
+                            $fieldObj->nullable();
+                        }
                         break;
                     case 2:
                         $fieldObj = $table->integer($data['field']);
-                        if ($data['default'] !== '') {
-                            $fieldObj->default($data['default']);
-                        } else if (! $data['is_must']) {
+                        if (! $data['is_must']) {
                             $fieldObj->nullable();
                         }
                         break;
@@ -145,9 +146,7 @@ class FormField extends BaseModel
                         $len = $data['len'] > 65 ? 65 : $data['len'];
                         $decimal = $data['decimal'] > 30 ? 30 : $data['decimal'];
                         $fieldObj = $table->decimal($data['field'], $len + $decimal, $decimal);
-                        if ($data['default'] !== '') {
-                            $fieldObj->default($data['default']);
-                        } else if (! $data['is_must']) {
+                        if (! $data['is_must']) {
                             $fieldObj->nullable();
                         }
                         break;
@@ -173,5 +172,54 @@ class FormField extends BaseModel
         } catch (\Exception $e) {
             return $this->appendMessage($e->getMessage());
         }
+    }
+
+    public function getOne(int $id)
+    {
+        $info = self::find($id);
+        if (! $info) {
+            return $this->appendMessage('该字段不存在');
+        }
+        $formInfo = (new Form())->getOne($info->form_id);
+        if (! $formInfo) {
+            return $this->appendMessage('该字段不存在');
+        }
+        return $info;
+    }
+
+    public function edit(int $id, array $data)
+    {
+        $info = self::find($id);
+        $form = Form::find($info->form_id);
+        Schema::table('form_data_' . $form->table, function (Blueprint $table) use ($data, $info) {
+            if ($info->is_unique == 1 && $data['is_unique'] == 0) {
+                $table->dropUnique($info->field);
+            } else if ($info->is_unique == 0) {
+                if ($data['is_unique'] == 1) {
+                    if ($info->is_index == 1) {
+                        $table->dropIndex($info->field);
+                    }
+                    $table->unique($info->field, $info->field);
+                } else if ($info->is_index == 1 && $data['is_index'] == 0) {
+                    $table->dropIndex($info->field);
+                } else if ($info->is_index == 0 && $data['is_index'] == 1) {
+                    $table->index($info->field, $info->field);
+                }
+            }
+        });
+        return $info->fill($data)->save();
+    }
+
+    public function deleteById(int $id)
+    {
+        $info = $this->getOne($id);
+        if (! $info) {
+            return $this->appendMessage('该字段不存在');
+        }
+        $form = Form::find($info->form_id);
+        Schema::table('form_data_' . $form->table, function (Blueprint $table) use ($info) {
+            $table->dropColumn($info->field);
+        });
+        return $info->delete();
     }
 }

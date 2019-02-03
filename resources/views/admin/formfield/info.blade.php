@@ -20,7 +20,7 @@
 		<div class="layui-form-item">
 			<label for="type" class="layui-form-label form-label-large">字段类型</label>
 			<div class="layui-input-inline input-large">
-				<select name="type" id="type" lay-filter="type">
+				<select name="type" id="type" lay-filter="type" class="@if($action == 'edit')layui-disabled layui-bg-gray @endif" @if($action == 'edit')disabled  @endif>
 					@foreach($typeProperty as $key => $value)
 					<option value="{{ $key }}" @if(isset($info) && $info->type==$key)selected @endif>{{ $value['text'] }}</option>
 					@endforeach
@@ -31,7 +31,7 @@
 		<div class="layui-form-item">
 			<label for="property" class="layui-form-label form-label-large">字段属性</label>
 			<div class="layui-input-inline input-large">
-				<select name="property" id="property" lay-filter="property">
+				<select name="property" id="property" lay-filter="property" class=" @if($action == 'edit')layui-disabled layui-bg-gray @endif" @if($action == 'edit')disabled  @endif>
 					@php
 					$type = isset($info) ? $info->type : 1;
 					@endphp
@@ -45,14 +45,14 @@
 		<div class="layui-form-item">
 			<label for="len" class="layui-form-label form-label-large">字段长度</label>
 			<div class="layui-input-inline input-large">
-				<input type="text" id="len" name="len" value="@isset($info){{ $info->len }}@endisset" lay-verify="required" autocomplete="off" class="layui-input">
+				<input type="text" id="len" name="len" value="@isset($info){{ $info->len }}@endisset" lay-verify="required" autocomplete="off" class="layui-input @if($action == 'edit')layui-disabled layui-bg-gray @endif" @if($action == 'edit')disabled  @endif>
 			</div>
 			<div class="layui-form-mid layui-word-aux" id="len-msg"></div>
 		</div>
 		<div class="layui-form-item">
 			<label for="decimal" class="layui-form-label form-label-large">小数点位数</label>
 			<div class="layui-input-inline input-large">
-				<input type="text" id="decimal" name="decimal" value="@isset($info){{ $info->decimal }}@endisset" lay-verify="required" autocomplete="off" class="layui-input">
+				<input type="text" id="decimal" name="decimal" value="@isset($info){{ $info->decimal }}@endisset" lay-verify="required" autocomplete="off" class="layui-input  @if($action == 'edit')layui-disabled layui-bg-gray @endif" @if($action == 'edit')disabled  @endif>
 			</div>
 			<div class="layui-form-mid layui-word-aux" id="decimal-msg"></div>
 		</div>
@@ -134,7 +134,7 @@
 			<label class="layui-form-label form-label-large"></label>
 			@if($actionPower) 
 				@csrf
-				<input type="hidden" name="form_id" value="{{ $formId }}" /> 
+				<input type="hidden" name="form_id" value="@if(isset($formId)){{ $formId }}@elseif(isset($info)){{ $info->form_id }}@endif" /> 
 				@if(isset($info)) 
 				<input type="hidden" name="id" value="{{ $info->id }}" /> 
 				@endif
@@ -161,14 +161,16 @@
 		function setOther(reSetValue = false) {
 			var type = $("#type").val();
 			var property = $("#property").val();
-			
+
 			$("#property-msg").html('');
-			$("#len").removeClass('layui-bg-gray');
-			$("#len").attr('readonly', false);
-			$("#len-msg").html('');
-			$("#decimal").removeClass('layui-bg-gray');
-			$("#decimal").attr('readonly', false);
-			$("#decimal-msg").html('');
+			if(reSetValue) {
+				$("#len").removeClass('layui-bg-gray');
+				$("#len").attr('readonly', false);
+				$("#len-msg").html('');
+				$("#decimal").removeClass('layui-bg-gray');
+				$("#decimal").attr('readonly', false);
+				$("#decimal-msg").html('');
+			}
 			$("#default").removeClass('layui-bg-gray');
 			$("#default").attr('readonly', false);
 			$("#default-msg").html('');
@@ -246,7 +248,7 @@
     						$("#config").addClass('layui-bg-gray');
     						$("#config").attr('readonly', true);
     						if(reSetValue) {
-    							$("#len").val(20480);
+    							$("#len").val(type=='2' ? 250 : 20480);
     							$("#decimal").val(0);
     							$("#config").val('');
     						}
@@ -406,9 +408,6 @@
           //监听提交
           form.on('submit(submit)', function(data){
         	  var requestData = data.field;
-        	  @if($action == 'edit')
-              delete requestData.field;
-              @endif
               $.ajax({
   				type:'post',
       			url:'{{ $actionUrl }}',

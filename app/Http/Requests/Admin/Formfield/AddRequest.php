@@ -46,7 +46,7 @@ class AddRequest extends Request
                         $formField = FormField::where('form_id', $this->post('form_id'))->Where('name', $value);
                         $id = $this->post('id', 0);
                         if (! empty($id)) {
-                            $formField = $formField->andWhere('id', '<>', $id);
+                            $formField = $formField->Where('id', '<>', $id);
                         }
                         $count = $formField->count();
                         if ($count) {
@@ -58,7 +58,12 @@ class AddRequest extends Request
                     'required',
                     'regex:/^[a-zA-Z]\w{1,20}$/',
                     function ($attrbute, $value, $fail) {
-                        $count = FormField::where('form_id', $this->post('form_id'))->Where('field', $value)->count();
+                        $formField = FormField::where('form_id', $this->post('form_id'))->Where('field', $value);
+                        $id = $this->post('id', 0);
+                        if (! empty($id)) {
+                            $formField = $formField->Where('id', '<>', $id);
+                        }
+                        $count = $formField->count();
                         if ($count) {
                             return $fail('该字段名称已存在');
                         }
