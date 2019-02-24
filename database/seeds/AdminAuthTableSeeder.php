@@ -363,6 +363,86 @@ class AdminAuthTableSeeder extends Seeder
                     'sequence' => 1055,
                     'note' => '管理员修改资料',
                     'icon' => ''
+                ],
+                [
+                    'id' => 1012,
+                    'pid' => 115,
+                    'name' => '添加字段',
+                    'controller' => 'formfield',
+                    'action' => 'add',
+                    'sequence' => 1060,
+                    'note' => '表单字段添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1013,
+                    'pid' => 115,
+                    'name' => '查看',
+                    'controller' => 'formfield',
+                    'action' => 'info',
+                    'sequence' => 1065,
+                    'note' => '表单字段查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1014,
+                    'pid' => 115,
+                    'name' => '修改',
+                    'controller' => 'formfield',
+                    'action' => 'edit',
+                    'sequence' => 1070,
+                    'note' => '表单字段修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1015,
+                    'pid' => 115,
+                    'name' => '删除',
+                    'controller' => 'formfield',
+                    'action' => 'delete',
+                    'sequence' => 1075,
+                    'note' => '表单字段删除',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1016,
+                    'pid' => 116,
+                    'name' => '添加数据',
+                    'controller' => 'formdata',
+                    'action' => 'add',
+                    'sequence' => 1080,
+                    'note' => '表单数据添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1017,
+                    'pid' => 116,
+                    'name' => '查看',
+                    'controller' => 'formdata',
+                    'action' => 'info',
+                    'sequence' => 1085,
+                    'note' => '表单数据查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1018,
+                    'pid' => 116,
+                    'name' => '修改',
+                    'controller' => 'formdata',
+                    'action' => 'edit',
+                    'sequence' => 1090,
+                    'note' => '表单数据修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1019,
+                    'pid' => 116,
+                    'name' => '删除',
+                    'controller' => 'formdata',
+                    'action' => 'delete',
+                    'sequence' => 1095,
+                    'note' => '表单数据删除',
+                    'icon' => ''
                 ]
             ]);
     }

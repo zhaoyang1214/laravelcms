@@ -66,6 +66,9 @@ class Form extends BaseModel
     public function add(array $data)
     {
         $data['no'] = md5(md5($data['name'] . microtime(true)));
+        if (! empty($data['sort'])) {
+            $data['sort'] = preg_replace('/\s+/', ' ', str_replace('，', ',', strtolower($data['sort'])));
+        }
         $table = $this->table . '_data_' . $data['table'];
         if (Schema::hasTable($table)) {
             return $this->appendMessage('该表已存在');

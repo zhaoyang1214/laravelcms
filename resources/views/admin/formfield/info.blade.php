@@ -215,11 +215,11 @@
 							$("#decimal").addClass('layui-bg-gray');
 							$("#decimal").attr('readonly', true);
 							$("#default-msg").html('默认值只能设置为 xxxx-xx-xx xx:xx:xx 格式，允许为空');
-							$("#config-msg").html('配置后台显示格式和时间选择器格式(json)，默认：<br/>{"php":"Y-m-d H:i:s","js":"yyyy-MM-dd HH:mm:ss"}');
+							$("#config-msg").html('配置后台显示格式和时间选择器格式(json)，默认：<br/>{"php_format":"Y-m-d H:i:s",<br/>"laydate_type":"datetime",<br/>"laydate_format":"yyyy-MM-dd HH:mm:ss"}');
 							if(reSetValue) {
 								$("#len").val(0);
 								$("#decimal").val(0);
-								$("#config").val('{"php":"Y-m-d H:i:s","js":"yyyy-MM-dd HH:mm:ss"}');
+								$("#config").val('{"php_format":"Y-m-d H:i:s","laydate_type":"datetime","laydate_format":"yyyy-MM-dd HH:mm:ss"}');
 							}
 							break;
 						case '5':

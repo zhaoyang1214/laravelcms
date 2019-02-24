@@ -62,8 +62,11 @@ class FormController extends Controller
     public function edit(EditRequest $request)
     {
         $form = Form::find($request->post('id'));
-        $res = $form->fill($request->post())
-            ->save();
+        $data = $request->post();
+        if (! empty($data['sort'])) {
+            $data['sort'] = preg_replace('/\s+/', ' ', str_replace('，', ',', strtolower($data['sort'])));
+        }
+        $res = $form->fill($data)->save();
         if ($res) {
             return response()->json([
                 'status' => 10000,

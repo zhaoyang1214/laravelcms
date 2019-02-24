@@ -5,6 +5,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use App\Models\Upload;
+use Illuminate\Http\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\Filesystem;
 
 class UeditorController extends Controller
 {
@@ -111,7 +115,7 @@ class UeditorController extends Controller
                     'thumbnail_maxheight' => intval($request->post('thumbnail_maxheight', 110)),
                     'thumbnail_cutout' => intval($request->post('thumbnail_cutout', 1))
                 ];
-                $response = $this->uploadfile($config);
+                $response = $this->uploadfile($config, $request);
                 break;
             case 'uploadvideo':
                 $config = [
@@ -120,7 +124,7 @@ class UeditorController extends Controller
                     'pathFormat' => $this->ueditorConfig['videoPathFormat'],
                     'origin' => intval($request->get('origin', - 1))
                 ];
-                $response = $this->uploadfile($config);
+                $response = $this->uploadfile($config, $request);
                 break;
             case 'uploadfile':
                 $config = [
@@ -129,7 +133,7 @@ class UeditorController extends Controller
                     'pathFormat' => $this->ueditorConfig['filePathFormat'],
                     'origin' => intval($request->get('origin', - 1))
                 ];
-                $response = $this->uploadfile($config);
+                $response = $this->uploadfile($config, $request);
                 break;
             case 'uploadscrawl':
                 $config = [
@@ -201,13 +205,13 @@ class UeditorController extends Controller
         $base64Data = $config['base64Data'];
         if (empty($base64Data)) {
             $state = '未上传图片';
-            goto error_response;
+            goto uploadbase64_error_response;
         }
         $imagedata = base64_decode($base64Data);
         $fileSize = strlen($imagedata);
         if ($fileSize > $config['maxSize']) {
             $state = '图片大小超出限制';
-            goto error_response;
+            goto uploadbase64_error_response;
         }
         try {
             $img = Image::make($base64Data);
@@ -215,13 +219,13 @@ class UeditorController extends Controller
             $extension = image_type_to_extension($imagetype);
             if (! in_array($extension, $config['allowFiles'])) {
                 $state = '图片类型错误';
-                goto error_response;
+                goto uploadbase64_error_response;
             }
             if ($config['watermark_switch']) {
                 $watermarkImageFile = '.' . config('system.watermark_image');
                 if (! is_file($watermarkImageFile)) {
                     $state = '水印图片不存在';
-                    goto error_response;
+                    goto uploadbase64_error_response;
                 }
                 re_watermark_place:
                 switch ($config['watermark_place']) {
@@ -262,19 +266,19 @@ class UeditorController extends Controller
             if (! is_dir($config['pathFormat'])) {
                 if (! mkdir($config['pathFormat'], 0777, true)) {
                     $state = '创建目录失败:' . $config['pathFormat'];
-                    goto error_response;
+                    goto uploadbase64_error_response;
                 }
             }
             $filePath = $config['pathFormat'] . $fileName . $extension;
             $img->save($filePath);
         } catch (\Exception $e) {
             $state = $e->getMessage();
-            goto error_response;
+            goto uploadbase64_error_response;
         }
         $filePath = ltrim($filePath, '.');
         Upload::create([
             'file' => $filePath,
-            'folder' => $config['pathFormat'],
+            'folder' => ltrim($config['pathFormat'], '.'),
             'title' => $fileName,
             'ext' => ltrim($extension, '.'),
             'size' => $fileSize,
@@ -290,9 +294,166 @@ class UeditorController extends Controller
             'url' => $filePath
         ];
         $state = '上传失败';
-        error_response:
+        uploadbase64_error_response:
         return [
             'state' => $state
+        ];
+    }
+
+    private function uploadfile(array $config, Request $request)
+    {
+        $files = $request->file();
+        if (! $files) {
+            $state = '未上传文件';
+            goto uploadfile_error_response;
+        }
+        $key = key($files);
+        $file = array_shift($files);
+        // $type = '.' . strtolower(substr($file->getMimeType(), 6));
+        $extension = '.' . strtolower($file->getClientOriginalExtension());
+        if (/* ! in_array($type, $config['allowFiles']) &&  */! in_array($extension, $config['allowFiles'])) {
+            $state = '文件类型错误';
+            goto uploadfile_error_response;
+        }
+        $fileSize = $file->getSize();
+        if ($fileSize > $config['maxSize']) {
+            $state = '文件大小超出限制';
+            goto uploadfile_error_response;
+        }
+        // $filePath = $request->file($key)->store(rtrim($config['pathFormat'], '/'));
+        $fileName = md5(microtime(true) . mt_rand(1000, 9999)) . $extension;
+        $filePath = $request->file($key)->move($config['pathFormat'], $fileName);
+        $pathinfo = pathinfo($filePath);
+        Upload::create([
+            'file' => ltrim($filePath, '.'),
+            'folder' => ltrim($config['pathFormat'], '.'),
+            'title' => $pathinfo['filename'],
+            'ext' => ltrim($extension, '.'),
+            'size' => $fileSize,
+            'type' => $file->getClientMimeType(),
+            'time' => date('Y-m-d H:i:s'),
+            'module' => $config['origin']
+        ]);
+        if (isset($config['watermark_switch']) && $config['watermark_switch']) {
+            $img = Image::make($filePath);
+            $watermarkImageFile = '.' . config('system.watermark_image');
+            if (! is_file($watermarkImageFile)) {
+                $state = '水印图片不存在';
+                goto uploadfile_error_response;
+            }
+            re_watermark_place:
+            switch ($config['watermark_place']) {
+                case 1:
+                    $position = 'top-left';
+                    break;
+                case 2:
+                    $position = 'top';
+                    break;
+                case 3:
+                    $position = 'top-right';
+                    break;
+                case 4:
+                    $position = 'left';
+                    break;
+                case 5:
+                    $position = 'center';
+                    break;
+                case 6:
+                    $position = 'right';
+                    break;
+                case 7:
+                    $position = 'bottom-left';
+                    break;
+                case 8:
+                    $position = 'bottom';
+                    break;
+                case 9:
+                    $position = 'bottom-right';
+                    break;
+                default:
+                    $config['watermark_place'] = mt_rand(1, 9);
+                    goto re_watermark_place;
+            }
+            $img->insert($watermarkImageFile, $position);
+            $img->save($filePath);
+        }
+        if (isset($config['thumbnail_switch']) && $config['thumbnail_switch']) {
+            $img = Image::make($filePath);
+            $imageWidth = $img->width();
+            $imageHeight = $img->height();
+            $width = $config['thumbnail_maxwidth'] <= 0 ? 210 : intval($config['thumbnail_maxwidth']);
+            $height = $config['thumbnail_maxheight'] <= 0 ? 110 : intval($config['thumbnail_maxheight']);
+            if ($config['thumbnail_cutout']) {
+                $img->crop($width, $height);
+            } else {
+                $width = intval(($width / 100) * $imageWidth);
+                $height = intval(($height / 100) * $imageHeight);
+                $img->resize($width, $height);
+            }
+            $thumbnailName = $pathinfo['filename'] . '_thumbnail.' . $pathinfo['extension'];
+            $thumbnailPath = $pathinfo['dirname'] . '/' . $thumbnailName;
+            $img->save($thumbnailPath);
+            Upload::create([
+                'file' => ltrim($thumbnailPath, '.'),
+                'folder' => ltrim($pathinfo['dirname'], '.'),
+                'title' => $pathinfo['filename'] . '_thumbnail',
+                'ext' => $pathinfo['extension'],
+                'size' => $img->filesize(),
+                'type' => $file->getClientMimeType(),
+                'time' => date('Y-m-d H:i:s'),
+                'module' => $config['origin']
+            ]);
+        }
+        $responseData = [
+            'original' => $file->getClientOriginalName(),
+            'size' => $fileSize,
+            'state' => 'SUCCESS',
+            'title' => $pathinfo['filename'],
+            'type' => $extension,
+            'url' => ltrim($filePath, '.')
+        ];
+        if (isset($thumbnailPath)) {
+            $responseData['thumbnail_url'] = ltrim($thumbnailPath, '.');
+        }
+        return $responseData;
+        uploadfile_error_response:
+        return [
+            'state' => $state
+        ];
+    }
+
+    private function listfile(array $config)
+    {
+        $directory = $config['listPath'] . date('Y-m/d');
+        $list = [];
+        $state = 'SUCCESS';
+        if (! is_dir($directory)) {
+            return [
+                'state' => 'SUCCESS',
+                'list' => [],
+                'start' => $config['start'],
+                'total' => 0
+            ];
+        }
+        $filesystem = new Filesystem();
+        $files = $filesystem->allFiles($directory);
+        $total = count($files);
+        $files = array_splice($files, $config['start'], $config['size']);
+        $list = [];
+        foreach ($files as $file) {
+            if ($file->getSize() > $config['maxSize']) {
+                continue;
+            }
+            $list[] = [
+                'url' => ltrim($file->getPathname(), '.'),
+                'mtime' => $file->getMTime()
+            ];
+        }
+        return [
+            'state' => 'SUCCESS',
+            'list' => $list,
+            'start' => $config['start'],
+            'total' => $total
         ];
     }
 }

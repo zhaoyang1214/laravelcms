@@ -222,4 +222,215 @@ class FormField extends BaseModel
         });
         return $info->delete();
     }
+
+    public function getFieldHtml($formData = null)
+    {
+        if (! isset($this->id)) {
+            return '';
+        }
+        $value = is_null($formData) ? $this->default : ($formData->{$this->field} ?? '');
+        $layVerify = $this->is_must ? 'required' : '';
+        switch ($this->type) {
+            case 1: // 单行文本框
+                $script = '';
+                $layuiDisabled = '';
+                switch ($this->property) {
+                    case 2:
+                    case 5:
+                        $layVerify .= empty($layVerify) ? 'number' : '|number';
+                        break;
+                    case 4:
+                        $layuiDisabled = 'layui-disabled';
+                        $config = empty($this->config) ? [] : json_decode($this->config, true);
+                        $phpFormat = $config['php_format'] ?? 'Y-m-d H:i:s';
+                        $laydateType = $config['laydate_type'] ?? 'datetime';
+                        $laydateFormat = $config['laydate_format'] ?? 'yyyy-MM-dd HH:mm:ss';
+                        if (! empty($value)) {
+                            $value = date($phpFormat, strtotime($value));
+                        }
+                        $script = <<<EOF
+                            <script>
+                        		layui.use(['laydate'], function(){
+                        			var laydate = layui.laydate;
+                                 	laydate.render({
+                                 	   elem: '#{$this->field}',
+                                  	   type: '$laydateType',
+                                  	   format: "$laydateFormat"
+                                 	});
+                        		});		
+                        	</script>
+EOF;
+                        break;
+                }
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				<input type="text" id="$this->field" name="$this->field" value="$value" lay-verify="$layVerify" autocomplete="off" class="layui-input $layuiDisabled">
+        			</div>
+                    $script
+EOF;
+                break;
+            case 2: // 多行文本框
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				<textarea id="$this->field" name="$this->field"  lay-verify="$layVerify" class="layui-textarea">$value</textarea>
+        			</div>
+EOF;
+                break;
+            case 3: // 编辑器
+                $value = htmlspecialchars_decode($value);
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xxxxlarge">
+        				<script src="/admin/js/ueditor.config.js" type="text/javascript"></script>
+                 		<script src="/lib/ueditor/ueditor.all.js" type="text/javascript"></script>
+                 		<script src="/lib/ueditor/lang/zh-cn/zh-cn.js" type="text/javascript"></script>
+                 		<script name="{$this->field}" id="{$this->field}" type="text/plain" style="width:100%; height:400px;">$value</script>
+                 		<script type="text/javascript">UE.getEditor("{$this->field}", {"serverUrl":"/admin/ueditor/index?origin=4"});</script>
+        			</div>
+EOF;
+                break;
+            case 4: // 文件上传
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				<div class="layui-input-inline input-large">
+        					<input type="text" name="{$this->field}" id="{$this->field}" value="$value" lay-verify="$layVerify" autocomplete="off" placeholder="请选择文件" class="layui-input layui-disabled">
+        				</div>
+        				<div class="layui-input-inline input-mini">
+        					<button type="button" class="layui-btn" id="upload-{$this->field}">上传文件</button>
+        				</div>
+        				<script type="text/javascript">
+                		$("#upload-{$this->field}").click(function() {
+                        	layer.open({
+                                type: 2,
+                                title: ['上传文件', 'font-weight: bold;font-size:larger;'],
+                                area: ['818px', '500px'],
+                                shade: 0,
+                                maxmin:true,
+                                content: '/admin/ueditor/getUpfileHtml?type=file&origin=4&id={$this->field}',
+                                zIndex: layer.zIndex
+                              });
+                        });
+                		</script>
+        			</div>
+EOF;
+                break;
+            case 5: // 单图片上传
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				<div class="layui-input-inline input-large">
+        					<input type="text" name="{$this->field}" id="{$this->field}"  value="$value" lay-verify="$layVerify" autocomplete="off" placeholder="请选择图片" class="layui-input layui-disabled">
+        				</div>
+        				<div class="layui-input-inline input-mini">
+        					<button type="button" class="layui-btn" id="upload-{$this->field}">上传图片</button>
+        				</div>
+        				<script type="text/javascript">
+                		$("#upload-{$this->field}").click(function() {
+                        	var height = $(window).height() - 2;
+                        	layer.open({
+                                type: 2,
+                                title: ['上传图片', 'font-weight: bold;font-size:larger;'],
+                                area: ['818px', height < '668' ? (height + 'px') : '668px'],
+                                shade: 0,
+                                maxmin:true,
+                                content: '/admin/ueditor/getUpfileHtml?type=image&origin=4&id={$this->field}',
+                                zIndex: layer.zIndex
+                              });
+                        });
+                		</script>
+        			</div>
+EOF;
+                break;
+            case 6: // 组图上传
+                $values = json_decode($value, true) ?? [];
+                $liHtml = '';
+                foreach ($values as $v) {
+                    $liHtml .= <<<EOF
+                        <li>
+        		             <div class="pic" id="images_button">
+        		             <img src="{$v['thumbnail_url']}" width="125" height="105" />
+        			              <input  id="{$this->field}_url[]" name="{$this->field}_url[]" type="hidden" value="{$v['url']}" />
+        			              <input  id="{$this->field}_thumbnail_url[]" name="{$this->field}_thumbnail_url[]" type="hidden" value="{$v['thumbnail_url']}" />
+        		             </div>
+        		             <div class="title">标题： <input name="{$this->field}_title[]" type="text" id="{$this->field}_title[]" value="{$v['title']}" /></div>
+        		             <div class="title">排序： <input id="{$this->field}_order[]" name="{$this->field}_order[]" value="{$v['order']}" type="text" style="width:50px;" /> <a href="javascript:void(0);" onclick="$(this).parent().parent().remove()">删除</a></div>
+        		         </li>
+EOF;
+                }
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xxxxlarge">
+        				<button type="button" class="layui-btn" id="{$this->field}_button">上传多图</button>
+        				<div class="fn_clear"></div>
+        				<div class="images">
+                	        <ul id="{$this->field}_list" class="images_list">
+                		      {$liHtml} 
+                	        </ul>
+                            <div style="clear:both"></div>
+                       	</div>
+                       	<script>
+                	        $("#{$this->field}_button").click(function() {
+                            	var height = $(window).height() - 2;
+                            	layer.open({
+                                    type: 2,
+                                    title: ['组图上传', 'font-weight: bold;font-size:larger;'],
+                                    area: ['818px', height < '668' ? (height + 'px') : '668px'],
+                                    shade: 0,
+                                    maxmin:true,
+                                    content: '/admin/ueditor/getUpfileHtml?type=images&origin=4&id={$this->field}',
+                                    zIndex: layer.zIndex
+                                  });
+                            });
+                        </script>
+        			</div>
+EOF;
+                break;
+            case 7: // 下拉菜单
+                $configArr = empty($this->config) ? [] : json_decode($this->config, true);
+                $optionHtml = '';
+                foreach ($configArr as $v => $title) {
+                    $selected = $v == $value ? 'selected="selected"' : '';
+                    $optionHtml .= "<option value='{$v}' {$selected}>{$title}</option>";
+                }
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				<select name="{$this->field}" id="{$this->field}">
+        					$optionHtml
+        				</select>
+        			</div>
+EOF;
+                break;
+            case 8: // 单选
+                $configArr = empty($this->config) ? [] : json_decode($this->config, true);
+                $inputHtml = '';
+                foreach ($configArr as $v => $title) {
+                    $checked = $v == $value ? 'checked="checked"' : '';
+                    $inputHtml .= "<input type='radio' name='{$this->field}' value='{$v}' title='{$title}' $checked >";
+                }
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				$inputHtml
+        			</div>
+EOF;
+                break;
+            case 9: // 多选
+                $configArr = empty($this->config) ? [] : json_decode($this->config, true);
+                $inputHtml = '';
+                foreach ($configArr as $v => $title) {
+                    $checked = $v == $value ? 'checked="checked"' : '';
+                    $inputHtml .= "<input type='checkbox' name='{$this->field}[]' value='{$v}' title='{$title}' $checked  class='keep'>";
+                }
+                $fieldHtml = <<<EOF
+                    <div class="layui-input-inline input-xlarge">
+        				$inputHtml
+        			</div>
+EOF;
+                break;
+        }
+        $html = <<<EOF
+            <div class="layui-form-item">
+    			<label for="{$this->field}" class="layui-form-label form-label-large">$this->name</label>
+    			$fieldHtml
+    			<div class="layui-form-mid layui-word-aux">$this->tip</div>
+    		</div>
+EOF;
+        return $html;
+    }
 }

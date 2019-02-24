@@ -74,5 +74,10 @@ Route::group([
         Route::post('formfield/edit', 'FormfieldController@edit');
         Route::post('formfield/delete', 'FormfieldController@delete');
         Route::get('formdata/index/{formId}', 'FormdataController@index')->where('formId', '[1-9][0-9]*');
+        Route::get('formdata/add/{formId}', 'FormdataController@add')->where('formId', '[1-9][0-9]*');
+        Route::post('formdata/add', 'FormdataController@add');
+        Route::get('formdata/info/{id}', 'FormdataController@info')->where('id', '[1-9][0-9]*');
+        Route::post('formdata/edit', 'FormdataController@edit');
+        Route::post('formdata/delete', 'FormdataController@delete');
     });
 });

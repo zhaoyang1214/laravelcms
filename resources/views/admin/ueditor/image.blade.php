@@ -219,7 +219,7 @@ $("#sureCut").on("click",function () {
             $.ajax({
     			type:'post',
     			url:"/admin/ueditor/index?origin={{ $origin }}&action=uploadscrawl",
-    			data:{ {{ $fieldName }}:base64url[1], watermark_switch:watermark_switch, watermark_place:$("#watermark_place :selected").val(),_token:"{{csrf_token()}}"},
+    			data:{ {{ $fieldName }}:base64url[1], watermark_switch:watermark_switch, watermark_place:$("#watermark_place :selected").val()},
     			dataType: "json",
     			async:true,
     			success: function(data){
