@@ -5,8 +5,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Form;
 use App\Models\Formdata;
 use App\Models\Admin;
-use App\Http\Requests\Admin\Formdata\AddRequest;
-use App\Http\Requests\Admin\Formdata\EditRequest;
 use Illuminate\Http\Request;
 use App\Models\FormField;
 
@@ -32,17 +30,17 @@ class FormdataController extends Controller
                 }
             }
         }
-        $datas = $formData->paginate(10);
+        $data = $formData->paginate(10);
         $formFieldList = FormField::where('form_id', $formInfo->id)->where('admin_display', 1)->get();
         $admin = new Admin();
         $formIndexPower = $admin->checkPower('form', 'index');
         $formdataAddPower = $admin->checkPower('formdata', 'add');
         $formdataInfoPower = $admin->checkPower('formdata', 'info');
         $formdataDeletePower = $admin->checkPower('formdata', 'delete');
-        return view('admin.formdata.index', compact('datas', 'formIndexPower', 'formdataAddPower', 'formdataInfoPower', 'formdataDeletePower', 'formInfo', 'formFieldList'));
+        return view('admin.formdata.index', compact('data', 'formIndexPower', 'formdataAddPower', 'formdataInfoPower', 'formdataDeletePower', 'formInfo', 'formFieldList'));
     }
 
-    public function add(AddRequest $request, $formId = null)
+    public function add(Request $request, $formId = null)
     {
         $formId = $formId ?? $request->post('form_id', 0);
         $formInfo = (new Form())->getOne($formId);
@@ -75,5 +73,75 @@ class FormdataController extends Controller
         $actionUrl = '/admin/formdata/add';
         $action = 'add';
         return view('admin.formdata.info', compact('actionPower', 'actionName', 'actionUrl', 'action', 'formId', 'formFieldList'));
+    }
+
+    public function info($formId, $id)
+    {
+        $formInfo = (new Form())->getOne($formId);
+        if (! $formInfo) {
+            return redirect('errors/404');
+        }
+        $formData = (new FormData($formInfo->table))->find($id);
+        if (! $formData) {
+            return redirect('errors/404');
+        }
+        $formFieldList = FormField::where('form_id', $formInfo->id)->orderBy('sequence')->get();
+        $actionPower = (new Admin())->checkPower('formdata', 'edit');
+        $actionName = '修改';
+        $actionUrl = '/admin/formdata/edit';
+        $action = 'edit';
+        return view('admin.formdata.info', compact('actionPower', 'actionName', 'actionUrl', 'action', 'formId', 'formFieldList', 'formData'));
+    }
+
+    public function edit(Request $request)
+    {
+        $formId = $request->post('form_id', 0);
+        $formInfo = (new Form())->getOne($formId);
+        if (! $formInfo) {
+            return response()->json([
+                'status' => 10002,
+                'message' => '表单不存在'
+            ]);
+        }
+        $formData = new FormData($formInfo->table);
+        $res = $formData->edit($request->post());
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '修改成功'
+            ]);
+        }
+        return response()->json([
+            'status' => 10001,
+            'message' => $formData->getMessages()[0]['message'] ?? '修改失败'
+        ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $formId = $request->post('form_id', 0);
+        $formInfo = (new Form())->getOne($formId);
+        if (! $formInfo) {
+            return response()->json([
+                'status' => 10002,
+                'message' => '表单不存在'
+            ]);
+        }
+        $id = $request->post('id', 0);
+        $formData = (new FormData($formInfo->table))->find($id);
+        if (! $formData) {
+            return redirect('errors/404');
+        }
+        $res = $formData->delete();
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '删除成功'
+            ]);
+        }
+        return response()->json([
+            'status' => 10001,
+            'message' => '删除失败'
+        ]);
     }
 }

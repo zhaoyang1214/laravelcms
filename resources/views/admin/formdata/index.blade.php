@@ -22,18 +22,18 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach ($datas as $data)
+			@foreach ($data as $formData)
 			<tr>
 				<td>{{ $loop->iteration }}</td>
 				@foreach ($formFieldList as $formField)
-				<td>1</td>
+				<td>{{ $formField->getFieldValue($formData) }}</td>
 				@endforeach
 				<td>
 					@if($formdataInfoPower)
-					<a class="layui-btn layui-btn-normal layui-btn-xs" onclick="x_admin_show('查看表单数据','/admin/formdata/info/{{ $data->id }}', 850)"><i class="layui-icon layui-icon-edit"></i>查看</a>
+					<a class="layui-btn layui-btn-normal layui-btn-xs" onclick="x_admin_show('查看表单数据','/admin/formdata/info/{{ $formInfo->id }}/{{ $formData->id }}', 850)"><i class="layui-icon layui-icon-edit"></i>查看</a>
 					@endif
 					@if($formdataDeletePower)
-					<a class="layui-btn layui-btn-danger layui-btn-xs del" data-id="{{ $data->id }}"><i class="layui-icon layui-icon-delete"></i>删除</a>
+					<a class="layui-btn layui-btn-danger layui-btn-xs del" data-id="{{ $formData->id }}"><i class="layui-icon layui-icon-delete"></i>删除</a>
 					@endif
 				</td>
 			</tr>
@@ -49,9 +49,9 @@ layui.use(['laypage', 'layer', 'jquery'], function(){
   var $ = layui.jquery;
   laypage.render({
 	    elem: 'page',
-	    count: {{ $datas->total() }},
-	    limit: {{ $datas->perPage() }},
-	    curr: {{ $datas->currentPage() }},
+	    count: {{ $data->total() }},
+	    limit: {{ $data->perPage() }},
+	    curr: {{ $data->currentPage() }},
 	    jump: function(obj, first){
 	        if(!first) {
 	        	layer.load();
@@ -69,7 +69,7 @@ layui.use(['laypage', 'layer', 'jquery'], function(){
 		  $.ajax({
   			type:'post',
   			url:'/admin/formdata/delete',
-  			data:{id:id, _token:"{{ csrf_token() }}"},
+  			data:{id:id, form_id:"{{$formInfo->id}}", _token:"{{ csrf_token() }}"},
   			dataType: "json",
   			success: function(data){
   				if(data.status == 10000) {

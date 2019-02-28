@@ -4,15 +4,15 @@
 <div class="x-body">
 	<form class="layui-form">
 		@foreach($formFieldList as $formField)
-			{!! $formField->getFieldHtml() !!}
+			{!! $formField->getFieldHtml($formData ?? null) !!}
 		@endforeach
 		<div class="layui-form-item">
 			<label class="layui-form-label form-label-large"></label>
 			@if($actionPower) 
 				@csrf
-				<input type="hidden" name="form_id" value="@if(isset($formId)){{ $formId }}@elseif(isset($info)){{ $info->form_id }}@endif" /> 
-				@if(isset($info)) 
-				<input type="hidden" name="id" value="{{ $info->id }}" /> 
+				<input type="hidden" name="form_id" value="@if(isset($formId)){{ $formId }}@elseif(isset($formData)){{ $formData->form_id }}@endif" /> 
+				@if(isset($formData)) 
+				<input type="hidden" name="id" value="{{ $formData->id }}" /> 
 				@endif
 				<button class="layui-btn" lay-filter="submit" lay-submit="">{{ $actionName }}</button>
 			@endif

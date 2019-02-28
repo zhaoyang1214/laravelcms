@@ -433,4 +433,96 @@ EOF;
 EOF;
         return $html;
     }
+
+    public function getFieldValue($formData)
+    {
+        if (! isset($this->id)) {
+            return '';
+        }
+        $value = is_array($formData) ? $formData[$this->field] : $formData->{$this->field};
+        switch ($this->type) {
+            // 单行文本框
+            case 1:
+                switch ($this->property) {
+                    case 1:
+                        if ($this->admin_display_len) {
+                            $suffix = mb_strlen($value) > $this->admin_display_len ? '...' : '';
+                            $value = mb_substr($value, 0, $this->admin_display_len) . $suffix;
+                        }
+                        break;
+                    case 2:
+                    case 5:
+                        break;
+                    case 4:
+                        $config = empty($this->config) ? [] : json_decode($this->config, true);
+                        $phpFormat = $config['php_format'] ?? 'Y-m-d H:i:s';
+                        $value = ! empty($value) ? date($phpFormat, strtotime($value)) : $value;
+                        break;
+                }
+                break;
+            // 多行文本框
+            case 2:
+                if ($this->admin_display_len) {
+                    $suffix = mb_strlen($value) > $this->admin_display_len ? '...' : '';
+                    $value = mb_substr($value, 0, $this->admin_display_len) . $suffix;
+                }
+                break;
+            // 编辑器
+            case 3:
+                $value = htmlspecialchars_decode($value);
+                if ($this->admin_display_len) {
+                    $suffix = mb_strlen($value) > $this->admin_display_len ? '...' : '';
+                    $value = mb_substr($value, 0, $this->admin_display_len) . $suffix;
+                }
+                break;
+            // 文件上传
+            case 4:
+                $value = '<a href="' . $value . '">' . basename($value) . '</a>';
+                break;
+            // 单图片上传
+            case 5:
+                $value = '<img src="' . $value . '" alt="" style="max-width:170px; max-height:90px; _width:170px; _height:90px;" />';
+                break;
+            // 组图上传
+            case 6:
+                $values = json_decode($value, true) ?? [];
+                $value = '';
+                foreach ($values as $k => $v) {
+                    if ($this->admin_display_len && $this->admin_display_len == $k) {
+                        break;
+                    }
+                    $value .= '<img src="' . $v['thumbnail_url'] . '" alt="' . $v['title'] . '" style="max-width:170px; max-height:90px; _width:170px; _height:90px;margin-left: 5px;" />';
+                }
+                break;
+            // 下拉
+            case 7:
+            // 单选
+            case 8:
+                $configArr = empty($this->config) ? [] : json_decode($this->config, true);
+                foreach ($configArr as $v => $title) {
+                    if ($v == $value) {
+                        $value = $title;
+                        break;
+                    }
+                }
+                break;
+            // 多选
+            case 9:
+                $configArr = empty($this->config) ? [] : json_decode($this->config, true);
+                $values = explode(',', $value);
+                $value = '';
+                $i = 0;
+                foreach ($configArr as $v => $title) {
+                    if ($this->admin_display_len && $this->admin_display_len == $i ++) {
+                        $value .= count($values) > $this->admin_display_len ? '...' : '';
+                        break;
+                    }
+                    if (in_array($v, $values)) {
+                        $value .= $title . ' ';
+                    }
+                }
+                break;
+        }
+        return $value;
+    }
 }

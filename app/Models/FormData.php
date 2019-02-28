@@ -117,4 +117,23 @@ class FormData extends BaseModel
         }
         return $res;
     }
+
+    public function edit(array $data)
+    {
+        $id = $data['id'] ?? 0;
+        $info = self::find($id);
+        if (! $info) {
+            return $this->appendMessage('记录不存在');
+        }
+        $data = $this->checkData($data, $data['form_id']);
+        if ($data === false) {
+            return false;
+        }
+        unset($data['id']);
+        $res = $info->fill($data)->save();
+        if (! $res) {
+            return $this->appendMessage('修改失败');
+        }
+        return $res;
+    }
 }
