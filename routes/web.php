@@ -82,5 +82,19 @@ Route::group([
         ]);
         Route::post('formdata/edit', 'FormdataController@edit');
         Route::post('formdata/delete', 'FormdataController@delete');
+        Route::get('expand/index', 'ExpandController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'expand/add', 'ExpandController@add');
+        Route::get('expand/info/{id}', 'ExpandController@info')->where('id', '[1-9][0-9]*');
+        Route::post('expand/edit', 'ExpandController@edit');
+        Route::post('expand/delete', 'ExpandController@delete');
+        Route::get('expandfield/index/{expandId}', 'ExpandfieldController@index')->where('expandId', '[1-9][0-9]*');
+        Route::get('expandfield/add/{expandId}', 'ExpandfieldController@add')->where('expandId', '[1-9][0-9]*');
+        Route::post('expandfield/add', 'ExpandfieldController@add');
+        Route::get('expandfield/info/{id}', 'ExpandfieldController@info')->where('id', '[1-9][0-9]*');
+        Route::post('expandfield/edit', 'ExpandfieldController@edit');
+        Route::post('expandfield/delete', 'ExpandfieldController@delete');
     });
 });

@@ -443,6 +443,96 @@ class AdminAuthTableSeeder extends Seeder
                     'sequence' => 1095,
                     'note' => '表单数据删除',
                     'icon' => ''
+                ],
+                [
+                    'id' => 1020,
+                    'pid' => 102,
+                    'name' => '添加扩展模型',
+                    'controller' => 'expand',
+                    'action' => 'add',
+                    'sequence' => 1100,
+                    'note' => '扩展模型添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1021,
+                    'pid' => 102,
+                    'name' => '查看',
+                    'controller' => 'expand',
+                    'action' => 'info',
+                    'sequence' => 1105,
+                    'note' => '扩展模型查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1022,
+                    'pid' => 102,
+                    'name' => '修改',
+                    'controller' => 'expand',
+                    'action' => 'edit',
+                    'sequence' => 1110,
+                    'note' => '扩展模型修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1023,
+                    'pid' => 102,
+                    'name' => '删除',
+                    'controller' => 'expand',
+                    'action' => 'delete',
+                    'sequence' => 1115,
+                    'note' => '扩展模型删除',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1024,
+                    'pid' => 102,
+                    'name' => '字段管理',
+                    'controller' => 'expandfield',
+                    'action' => 'index',
+                    'sequence' => 1120,
+                    'note' => '扩展模型字段管理',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10000,
+                    'pid' => 1024,
+                    'name' => '添加字段',
+                    'controller' => 'expandfield',
+                    'action' => 'add',
+                    'sequence' => 10000,
+                    'note' => '扩展模型字段添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10001,
+                    'pid' => 1024,
+                    'name' => '查看',
+                    'controller' => 'expandfield',
+                    'action' => 'info',
+                    'sequence' => 10005,
+                    'note' => '扩展模型字段查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10002,
+                    'pid' => 1024,
+                    'name' => '修改',
+                    'controller' => 'expandfield',
+                    'action' => 'edit',
+                    'sequence' => 10010,
+                    'note' => '扩展模型字段修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10003,
+                    'pid' => 1024,
+                    'name' => '删除',
+                    'controller' => 'expandfield',
+                    'action' => 'delete',
+                    'sequence' => 10015,
+                    'note' => '扩展模型字段删除',
+                    'icon' => ''
                 ]
             ]);
     }

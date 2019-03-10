@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use App\Models\Upload;
 use Illuminate\Http\File;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 
 class UeditorController extends Controller

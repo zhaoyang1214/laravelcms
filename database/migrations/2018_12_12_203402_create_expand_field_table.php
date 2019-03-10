@@ -43,6 +43,9 @@ class CreateExpandFieldTable extends Migration
             $table->tinyInteger('is_must')
                 ->default(0)
                 ->comment('是否必填，0：否，1：是');
+            $table->tinyInteger('is_unique')
+                ->default(0)
+                ->comment('是否唯一，0：否，1：是');
             $table->tinyInteger('is_index')
                 ->default(0)
                 ->comment('是否添加普通索引，0：否，1：是');
