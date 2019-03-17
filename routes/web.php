@@ -96,5 +96,13 @@ Route::group([
         Route::get('expandfield/info/{id}', 'ExpandfieldController@info')->where('id', '[1-9][0-9]*');
         Route::post('expandfield/edit', 'ExpandfieldController@edit');
         Route::post('expandfield/delete', 'ExpandfieldController@delete');
+        Route::get('fragment/index', 'FragmentController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'fragment/add', 'FragmentController@add');
+        Route::get('fragment/info/{id}', 'FragmentController@info')->where('id', '[1-9][0-9]*');
+        Route::post('fragment/edit', 'FragmentController@edit');
+        Route::post('fragment/delete', 'FragmentController@delete');
     });
 });

@@ -495,6 +495,46 @@ class AdminAuthTableSeeder extends Seeder
                     'icon' => ''
                 ],
                 [
+                    'id' => 1025,
+                    'pid' => 103,
+                    'name' => '添加自定义变量',
+                    'controller' => 'fragment',
+                    'action' => 'add',
+                    'sequence' => 1125,
+                    'note' => '自定义变量添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1026,
+                    'pid' => 103,
+                    'name' => '查看',
+                    'controller' => 'fragment',
+                    'action' => 'info',
+                    'sequence' => 1130,
+                    'note' => '自定义变量查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1027,
+                    'pid' => 103,
+                    'name' => '修改',
+                    'controller' => 'fragment',
+                    'action' => 'edit',
+                    'sequence' => 1135,
+                    'note' => '自定义变量修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1028,
+                    'pid' => 103,
+                    'name' => '删除',
+                    'controller' => 'fragment',
+                    'action' => 'delete',
+                    'sequence' => 1140,
+                    'note' => '自定义变量删除',
+                    'icon' => ''
+                ],
+                [
                     'id' => 10000,
                     'pid' => 1024,
                     'name' => '添加字段',
