@@ -104,5 +104,13 @@ Route::group([
         Route::get('fragment/info/{id}', 'FragmentController@info')->where('id', '[1-9][0-9]*');
         Route::post('fragment/edit', 'FragmentController@edit');
         Route::post('fragment/delete', 'FragmentController@delete');
+        Route::get('replace/index', 'ReplaceController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'replace/add', 'ReplaceController@add');
+        Route::get('replace/info/{id}', 'ReplaceController@info')->where('id', '[1-9][0-9]*');
+        Route::post('replace/edit', 'ReplaceController@edit');
+        Route::post('replace/delete', 'ReplaceController@delete');
     });
 });

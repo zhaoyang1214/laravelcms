@@ -535,6 +535,46 @@ class AdminAuthTableSeeder extends Seeder
                     'icon' => ''
                 ],
                 [
+                    'id' => 1029,
+                    'pid' => 104,
+                    'name' => '添加内容替换',
+                    'controller' => 'replace',
+                    'action' => 'add',
+                    'sequence' => 1145,
+                    'note' => '内容替换添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1030,
+                    'pid' => 104,
+                    'name' => '查看',
+                    'controller' => 'replace',
+                    'action' => 'info',
+                    'sequence' => 1150,
+                    'note' => '内容替换查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1031,
+                    'pid' => 104,
+                    'name' => '修改',
+                    'controller' => 'replace',
+                    'action' => 'edit',
+                    'sequence' => 1155,
+                    'note' => '内容替换修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1032,
+                    'pid' => 104,
+                    'name' => '删除',
+                    'controller' => 'replace',
+                    'action' => 'delete',
+                    'sequence' => 1160,
+                    'note' => '内容替换删除',
+                    'icon' => ''
+                ],
+                [
                     'id' => 10000,
                     'pid' => 1024,
                     'name' => '添加字段',
