@@ -112,5 +112,16 @@ Route::group([
         Route::get('replace/info/{id}', 'ReplaceController@info')->where('id', '[1-9][0-9]*');
         Route::post('replace/edit', 'ReplaceController@edit');
         Route::post('replace/delete', 'ReplaceController@delete');
+        Route::get('tags/index', 'TagsController@index');
+        Route::post('tags/grouping', 'TagsController@grouping');
+        Route::post('tags/delete', 'TagsController@delete');
+        Route::get('tagsgroup/index', 'TagsgroupController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'tagsgroup/add', 'TagsgroupController@add');
+        Route::get('tagsgroup/info/{id}', 'TagsgroupController@info')->where('id', '[1-9][0-9]*');
+        Route::post('tagsgroup/edit', 'TagsgroupController@edit');
+        Route::post('tagsgroup/delete', 'TagsgroupController@delete');
     });
 });

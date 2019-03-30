@@ -575,6 +575,46 @@ class AdminAuthTableSeeder extends Seeder
                     'icon' => ''
                 ],
                 [
+                    'id' => 1033,
+                    'pid' => 105,
+                    'name' => '添加tag标签',
+                    'controller' => 'tags',
+                    'action' => 'add',
+                    'sequence' => 1165,
+                    'note' => 'tag标签添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1034,
+                    'pid' => 105,
+                    'name' => '分组',
+                    'controller' => 'tags',
+                    'action' => 'grouping',
+                    'sequence' => 1170,
+                    'note' => 'tag标签分组',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1035,
+                    'pid' => 105,
+                    'name' => '删除',
+                    'controller' => 'tags',
+                    'action' => 'delete',
+                    'sequence' => 1175,
+                    'note' => 'tag标签删除',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1036,
+                    'pid' => 105,
+                    'name' => 'TAG分组管理',
+                    'controller' => 'tagsgroup',
+                    'action' => 'index',
+                    'sequence' => 1180,
+                    'note' => 'tag标签分组管理',
+                    'icon' => ''
+                ],
+                [
                     'id' => 10000,
                     'pid' => 1024,
                     'name' => '添加字段',
@@ -612,6 +652,46 @@ class AdminAuthTableSeeder extends Seeder
                     'action' => 'delete',
                     'sequence' => 10015,
                     'note' => '扩展模型字段删除',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10004,
+                    'pid' => 1036,
+                    'name' => '添加TAG分组',
+                    'controller' => 'tagsgroup',
+                    'action' => 'add',
+                    'sequence' => 10020,
+                    'note' => 'TAG分组添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10005,
+                    'pid' => 1036,
+                    'name' => '查看',
+                    'controller' => 'tagsgroup',
+                    'action' => 'info',
+                    'sequence' => 10025,
+                    'note' => 'TAG分组查看',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10006,
+                    'pid' => 1036,
+                    'name' => '修改',
+                    'controller' => 'tagsgroup',
+                    'action' => 'edit',
+                    'sequence' => 10030,
+                    'note' => 'TAG分组修改',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 10007,
+                    'pid' => 1036,
+                    'name' => '删除',
+                    'controller' => 'tagsgroup',
+                    'action' => 'delete',
+                    'sequence' => 10035,
+                    'note' => 'TAG分组删除',
                     'icon' => ''
                 ]
             ]);
