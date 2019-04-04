@@ -131,5 +131,7 @@ Route::group([
         Route::get('position/info/{id}', 'PositionController@info')->where('id', '[1-9][0-9]*');
         Route::post('position/edit', 'PositionController@edit');
         Route::post('position/delete', 'PositionController@delete');
+        Route::get('upload/index', 'UploadController@index');
+        Route::post('upload/delete', 'UploadController@delete');
     });
 });

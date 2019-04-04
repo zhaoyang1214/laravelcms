@@ -655,6 +655,16 @@ class AdminAuthTableSeeder extends Seeder
                     'icon' => ''
                 ],
                 [
+                    'id' => 1041,
+                    'pid' => 107,
+                    'name' => '删除',
+                    'controller' => 'upload',
+                    'action' => 'delete',
+                    'sequence' => 1205,
+                    'note' => '附件删除',
+                    'icon' => ''
+                ],
+                [
                     'id' => 10000,
                     'pid' => 1024,
                     'name' => '添加字段',
