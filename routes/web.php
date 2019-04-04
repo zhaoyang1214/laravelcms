@@ -123,5 +123,13 @@ Route::group([
         Route::get('tagsgroup/info/{id}', 'TagsgroupController@info')->where('id', '[1-9][0-9]*');
         Route::post('tagsgroup/edit', 'TagsgroupController@edit');
         Route::post('tagsgroup/delete', 'TagsgroupController@delete');
+        Route::get('position/index', 'PositionController@index');
+        Route::match([
+            'get',
+            'post'
+        ], 'position/add', 'PositionController@add');
+        Route::get('position/info/{id}', 'PositionController@info')->where('id', '[1-9][0-9]*');
+        Route::post('position/edit', 'PositionController@edit');
+        Route::post('position/delete', 'PositionController@delete');
     });
 });
