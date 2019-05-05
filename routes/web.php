@@ -133,5 +133,28 @@ Route::group([
         Route::post('position/delete', 'PositionController@delete');
         Route::get('upload/index', 'UploadController@index');
         Route::post('upload/delete', 'UploadController@delete');
+        Route::get('category/index', 'CategoryController@index');
+        Route::post('category/sequence', 'CategoryController@sequence');
+        Route::match([
+            'get',
+            'post'
+        ], 'categorynews/add', 'CategorynewsController@add');
+        Route::get('categorynews/info/{id}', 'CategorynewsController@info')->where('id', '[1-9][0-9]*');
+        Route::post('categorynews/edit', 'CategorynewsController@edit');
+        Route::post('categorynews/delete', 'CategorynewsController@delete');
+        Route::match([
+            'get',
+            'post'
+        ], 'categorypage/add', 'CategorypageController@add');
+        Route::get('categorypage/info/{id}', 'CategorypageController@info')->where('id', '[1-9][0-9]*');
+        Route::post('categorypage/edit', 'CategorypageController@edit');
+        Route::post('categorypage/delete', 'CategorypageController@delete');
+        Route::match([
+            'get',
+            'post'
+        ], 'categoryjump/add', 'CategoryjumpController@add');
+        Route::get('categoryjump/info/{id}', 'CategoryjumpController@info')->where('id', '[1-9][0-9]*');
+        Route::post('categoryjump/edit', 'CategoryjumpController@edit');
+        Route::post('categoryjump/delete', 'CategoryjumpController@delete');
     });
 });

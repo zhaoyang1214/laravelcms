@@ -20,4 +20,16 @@ class CategoryModel extends BaseModel
         'create_time',
         'update_time'
     ];
+
+    public function getAllowCategoryList()
+    {
+        $list = self::where('status', 1)->get()->toArray();
+        $admin = new Admin();
+        foreach ($list as $k => $v) {
+            if (! $admin->checkPower($v['category'], 'add')) {
+                unset($list[$k]);
+            }
+        }
+        return $list;
+    }
 }

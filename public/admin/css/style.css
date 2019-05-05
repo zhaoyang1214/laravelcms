@@ -97,3 +97,6 @@
 .table_list td {height:25px ;}
 .table_list td a { }
 .table_list td a:hover {  }
+
+.advanced { display: none }
+.sequence { border: 1px dashed #ddd; text-align: center; width: 50px; padding:0px; }

@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Overtrue\Pinyin\Pinyin;
+
 class Category extends BaseModel
 {
 
@@ -41,8 +43,61 @@ class Category extends BaseModel
             }
             $query->whereIn('id', explode(',', $adminGroupInfo['category_ids']));
         }
-        return $query->orderBy('sequence')
+        $list = $query->orderBy('sequence')
             ->get()
             ->toArray();
+        if (empty($list)) {
+            return [];
+        }
+        $toolsCategory = new \App\Library\Tools\Category($list, [
+            'title' => 'name',
+            'fulltitle' => 'cname'
+        ]);
+        return $toolsCategory->reclassify();
+    }
+
+    public function add($data)
+    {
+        $data['category_model_id'] = 1;
+        if (empty($data['name'])) {
+            return $this->appendMessage('栏目名称不能为空');
+        }
+        if (empty($data['urlname'])) {
+            $pinyin = new Pinyin();
+            $urlname = $pinyin->permalink($data['name'], '');
+            if (strlen($urlname) > 100) {
+                $urlname = substr($urlname, 0, 68) . md5(substr($urlname, 68));
+            }
+            $data['urlname'] = $urlname;
+        }
+        if (self::where('urlname', $data['urlname'])->count()) {
+            return $this->appendMessage('该栏目url已存在');
+        }
+        $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        return self::create($data);
+    }
+
+    public function edit($data)
+    {
+        $category = self::find(intval($data['id']));
+        if (empty($category)) {
+            return $this->appendMessage('栏目不存在');
+        }
+        if (empty($data['name'])) {
+            return $this->appendMessage('栏目名称不能为空');
+        }
+        if (empty($data['urlname'])) {
+            $pinyin = new Pinyin();
+            $urlname = $pinyin->permalink($data['name'], '');
+            if (strlen($urlname) > 100) {
+                $urlname = substr($urlname, 0, 68) . md5(substr($urlname, 68));
+            }
+            $data['urlname'] = $urlname;
+        }
+        if (self::where('urlname', $data['urlname'])->where('id', '<>', $data['id'])->count()) {
+            return $this->appendMessage('该栏目url已存在');
+        }
+        $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        return $category->fill($data)->save();
     }
 }

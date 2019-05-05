@@ -245,6 +245,136 @@ class AdminAuthTableSeeder extends Seeder
                     'icon' => ''
                 ],
                 [
+                    'id' => 117,
+                    'pid' => 2,
+                    'name' => '栏目排序',
+                    'controller' => 'category',
+                    'action' => 'sequence',
+                    'sequence' => 185,
+                    'note' => '栏目排序',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 118,
+                    'pid' => 2,
+                    'name' => '添加新闻栏目',
+                    'controller' => 'categorynews',
+                    'action' => 'add',
+                    'sequence' => 190,
+                    'note' => '新闻栏目添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 119,
+                    'pid' => 2,
+                    'name' => '查看',
+                    'controller' => 'categorynews',
+                    'action' => 'info',
+                    'sequence' => 195,
+                    'note' => '查看新闻栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 120,
+                    'pid' => 2,
+                    'name' => '修改',
+                    'controller' => 'categorynews',
+                    'action' => 'edit',
+                    'sequence' => 200,
+                    'note' => '修改新闻栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 121,
+                    'pid' => 2,
+                    'name' => '删除',
+                    'controller' => 'categorynews',
+                    'action' => 'delete',
+                    'sequence' => 205,
+                    'note' => '删除新闻栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 122,
+                    'pid' => 2,
+                    'name' => '添加页面栏目',
+                    'controller' => 'categorypage',
+                    'action' => 'add',
+                    'sequence' => 210,
+                    'note' => '页面栏目添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 123,
+                    'pid' => 2,
+                    'name' => '查看',
+                    'controller' => 'categorypage',
+                    'action' => 'info',
+                    'sequence' => 215,
+                    'note' => '查看页面栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 124,
+                    'pid' => 2,
+                    'name' => '修改',
+                    'controller' => 'categorypage',
+                    'action' => 'edit',
+                    'sequence' => 220,
+                    'note' => '修改页面栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 125,
+                    'pid' => 2,
+                    'name' => '删除',
+                    'controller' => 'categorypage',
+                    'action' => 'delete',
+                    'sequence' => 225,
+                    'note' => '删除页面栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 126,
+                    'pid' => 2,
+                    'name' => '添加跳转栏目',
+                    'controller' => 'categoryjump',
+                    'action' => 'add',
+                    'sequence' => 230,
+                    'note' => '跳转栏目添加',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 127,
+                    'pid' => 2,
+                    'name' => '查看',
+                    'controller' => 'categoryjump',
+                    'action' => 'info',
+                    'sequence' => 235,
+                    'note' => '查看跳转栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 128,
+                    'pid' => 2,
+                    'name' => '修改',
+                    'controller' => 'categoryjump',
+                    'action' => 'edit',
+                    'sequence' => 240,
+                    'note' => '修改跳转栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 129,
+                    'pid' => 2,
+                    'name' => '删除',
+                    'controller' => 'categoryjump',
+                    'action' => 'delete',
+                    'sequence' => 245,
+                    'note' => '删除跳转栏目',
+                    'icon' => ''
+                ],
+                [
                     'id' => 1000,
                     'pid' => 100,
                     'name' => '保存',

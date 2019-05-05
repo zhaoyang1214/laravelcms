@@ -54,7 +54,7 @@
 			@foreach ($datas as $data)
 			<tr>
 				<td>{{ $loop->iteration }}</td>
-				<td><a href="{{ $data->file }}" target="_blank"> @if(!empty($title)){!! str_replace($title, "<font color='red'>$title</font>", $data->title) !!}@else {{ $data->title }}@endif</a>
+				<td><a href="javascript:;" rel="{{ $data->file }}" @if(in_array($data->ext, ['png','jpg','jpeg','gif','bmp']))class="class_pic" @endif> @if(!empty($title)){!! str_replace($title, "<font color='red'>$title</font>", $data->title) !!}@else {{ $data->title }}@endif</a>
         &nbsp;&nbsp;<a href="{{ $data->title }}" download="{{$data->title}}.{{$data->ext}}">[下载]</a></td>
 				<td>{{ $data->time }}</td>
 				<td>{{ $data->getModule($data->module) }}</td>
@@ -70,6 +70,10 @@
 	<div id="page"></div>
 </div>
 <script>
+//缩略图
+$(".class_pic").powerFloat({
+    targetMode: "ajax"
+});
 layui.use(['laypage', 'layer', 'jquery'], function(){
   var laypage = layui.laypage;
   var layer = layui.layer;
