@@ -16,7 +16,9 @@ class CategorynewsController extends Controller
     {
         if ($request->isMethod('post')) {
             $category = new Category();
-            $res = $category->add($request->post());
+            $data = $request->post();
+            $data['category_model_id'] = 1;
+            $res = $category->add($data);
             if ($res) {
                 return response()->json([
                     'status' => 10000,
@@ -42,10 +44,7 @@ class CategorynewsController extends Controller
     {
         $info = Category::find($id);
         if (! $info) {
-            return response()->json([
-                'status' => 10001,
-                'message' => '记录不存在'
-            ]);
+            return redirect('errors/404');
         }
         $category = new Category();
         $categoryList = $category->getAllowList();

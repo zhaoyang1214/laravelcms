@@ -103,7 +103,7 @@ function sequence(id,sequence){
 	$.ajax({
 		type:'post',
 		url:'/admin/category/sequence',
-		data:{id:id,_token:'{{csrf_token()}}'},
+		data:{id:id,sequence:sequence,_token:'{{csrf_token()}}'},
 		dataType: "json",
 		success: function(data){
 			layer.msg(data.message);

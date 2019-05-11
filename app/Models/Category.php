@@ -58,7 +58,6 @@ class Category extends BaseModel
 
     public function add($data)
     {
-        $data['category_model_id'] = 1;
         if (empty($data['name'])) {
             return $this->appendMessage('栏目名称不能为空');
         }
@@ -73,7 +72,9 @@ class Category extends BaseModel
         if (self::where('urlname', $data['urlname'])->count()) {
             return $this->appendMessage('该栏目url已存在');
         }
-        $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        if (isset($data['keywords'])) {
+            $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        }
         return self::create($data);
     }
 
@@ -97,7 +98,9 @@ class Category extends BaseModel
         if (self::where('urlname', $data['urlname'])->where('id', '<>', $data['id'])->count()) {
             return $this->appendMessage('该栏目url已存在');
         }
-        $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        if (isset($data['keywords'])) {
+            $data['keywords'] = str_replace('，', ',', $data['keywords']);
+        }
         return $category->fill($data)->save();
     }
 }
