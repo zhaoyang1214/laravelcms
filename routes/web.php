@@ -156,5 +156,18 @@ Route::group([
         Route::get('categoryjump/info/{id}', 'CategoryjumpController@info')->where('id', '[1-9][0-9]*');
         Route::post('categoryjump/edit', 'CategoryjumpController@edit');
         Route::post('categoryjump/delete', 'CategoryjumpController@delete');
+        Route::get('content/list', 'ContentController@list');
+        Route::get('content/manage', 'ContentController@manage');
+        Route::get('content/index/{categoryId}', 'ContentController@index')->where('categoryId', '[1-9][0-9]*');
+        Route::post('content/audit', 'ContentController@audit');
+        Route::get('content/add/{categoryId}', 'ContentController@add')->where('categoryId', '[1-9][0-9]*');
+        Route::post('content/add', 'ContentController@add');
+        Route::get('content/info/{id}', 'ContentController@info')->where('id', '[1-9][0-9]*');
+        Route::post('content/edit', 'ContentController@edit');
+        Route::post('content/delete', 'ContentController@delete');
+        Route::get('content/quickEdit/{id}', 'ContentController@quickEdit')->where('id', '[1-9][0-9]*');
+        Route::post('content/quickEdit', 'ContentController@quickEdit');
+        Route::post('content/move', 'ContentController@move');
+        Route::post('content/getKeywords', 'ContentController@getKeywords');
     });
 });

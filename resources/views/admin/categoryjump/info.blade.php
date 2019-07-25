@@ -9,7 +9,7 @@
 				<select name="pid" id="pid" lay-filter="pid" style="width: 300px">
 					<option value="0">=====顶级栏目=====</option>
 					@foreach($categoryList as $value)
-					<option value="{{ $value['id'] }}" @if(isset($info) && $info['pid']==$value['id'])selected @endif>{{ $value['cname'] }}</option>
+					<option value="{{ $value['id'] }}" @if(isset($info) && $info['pid']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
 					@endforeach
 				</select>
 			</div>

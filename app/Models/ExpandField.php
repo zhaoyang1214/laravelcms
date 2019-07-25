@@ -4,6 +4,50 @@ namespace App\Models;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
+/**
+ * App\Models\ExpandField
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField query()
+ * @mixin \Eloquent
+ * @property int $id
+ * @property int $expand_id expand表id
+ * @property string $name 字段描述
+ * @property string $field 字段名
+ * @property int $type 字段类型，1：文本框；2：多行文本；3：编辑器，4：文件上传；5：单图片上传；6：组图上传；7：下拉菜单；8：单选；9：多选
+ * @property int $property 字段属性，1：varchar；2：int；3：text；4：datetime；5：decimal；
+ * @property int $len 长度
+ * @property int $decimal 小数点位数
+ * @property string $default 默认值
+ * @property int $sequence 排序，越小越排在前面
+ * @property string $tip 字段提示
+ * @property string $config 其他配置
+ * @property int $is_must 是否必填，0：否，1：是
+ * @property int $is_unique 是否唯一，0：否，1：是
+ * @property int $is_index 是否添加普通索引，0：否，1：是
+ * @property string $regex 正则表达式验证
+ * @property \Illuminate\Support\Carbon $create_time 创建时间
+ * @property \Illuminate\Support\Carbon|null $update_time 修改时间
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereConfig($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereCreateTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereDecimal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereExpandId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereField($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereIsIndex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereIsMust($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereIsUnique($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereLen($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereProperty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereRegex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereSequence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereTip($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExpandField whereUpdateTime($value)
+ */
 class ExpandField extends BaseModel
 {
 

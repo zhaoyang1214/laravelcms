@@ -4,6 +4,54 @@ namespace App\Models;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
+/**
+ * App\Models\FormField
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField query()
+ * @mixin \Eloquent
+ * @property int $id
+ * @property int $form_id form表id
+ * @property string $name 字段描述
+ * @property string $field 字段名
+ * @property int $type 字段类型，1：文本框；2：多行文本；3：编辑器，4：文件上传；5：单图片上传；6：组图上传；7：下拉菜单；8：单选；9：多选
+ * @property int $property 字段属性，1：varchar；2：int；3：text；4：datetime；5：decimal；
+ * @property int $len 字段长度
+ * @property int $decimal 小数点位数
+ * @property string $default 默认值
+ * @property int $sequence 排序，越小越排在前面
+ * @property string $tip 字段提示
+ * @property string $config 字段配置
+ * @property int $is_must 是否必填，0：否，1：是
+ * @property int $is_unique 是否唯一，0：否，1：是
+ * @property int $is_index 是否添加普通索引，0：否，1：是
+ * @property string $regex 正则表达式验证
+ * @property int $admin_display 是否后台显示，0：否，1：是
+ * @property int $admin_display_len 后台列表显示长度
+ * @property \Illuminate\Support\Carbon $create_time 创建时间
+ * @property \Illuminate\Support\Carbon|null $update_time 修改时间
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereAdminDisplay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereAdminDisplayLen($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereConfig($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereCreateTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereDecimal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereField($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereIsIndex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereIsMust($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereIsUnique($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereLen($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereProperty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereRegex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereSequence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereTip($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormField whereUpdateTime($value)
+ */
 class FormField extends BaseModel
 {
 

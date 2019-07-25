@@ -1,6 +1,14 @@
 <?php
 namespace App\Models;
 
+/**
+ * App\Models\FormData
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormData newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormData newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\FormData query()
+ * @mixin \Eloquent
+ */
 class FormData extends BaseModel
 {
 

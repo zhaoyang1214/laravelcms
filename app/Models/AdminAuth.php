@@ -1,6 +1,32 @@
 <?php
 namespace App\Models;
 
+/**
+ * App\Models\AdminAuth
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth query()
+ * @mixin \Eloquent
+ * @property int $id
+ * @property string $name 权限名称
+ * @property int $pid 父id
+ * @property string $controller 控制器
+ * @property string $action 操作方法
+ * @property int $sequence 排序，越小越排在前面
+ * @property string $note 备注
+ * @property string $icon 图标
+ * @property int $status 状态：0：隐藏，1：显示
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereAction($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereController($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereIcon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth wherePid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereSequence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AdminAuth whereStatus($value)
+ */
 class AdminAuth extends BaseModel
 {
 
@@ -11,7 +37,8 @@ class AdminAuth extends BaseModel
         'Index-index',
         'Index-home',
         'Admin-loginOut',
-        'Index-cleanCache'
+        'Index-cleanCache',
+        'Content-getKeywords'
     ];
 
     /**

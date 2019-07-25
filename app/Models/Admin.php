@@ -1,6 +1,32 @@
 <?php
 namespace App\Models;
 
+/**
+ * App\Models\Admin
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin query()
+ * @mixin \Eloquent
+ * @property int $id
+ * @property string $username 用户名
+ * @property string $password 密码
+ * @property string $nickname 昵称
+ * @property string $regtime 注册时间
+ * @property int $status 状态：1：正常，0：禁用
+ * @property int $admin_group_id admin_group表 id
+ * @property \Illuminate\Support\Carbon $create_time 创建时间
+ * @property \Illuminate\Support\Carbon|null $update_time 修改时间
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereAdminGroupId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereCreateTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereNickname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereRegtime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereUpdateTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Admin whereUsername($value)
+ */
 class Admin extends BaseModel
 {
 

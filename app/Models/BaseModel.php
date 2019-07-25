@@ -4,6 +4,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * App\Models\BaseModel
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BaseModel newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BaseModel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BaseModel query()
+ * @mixin \Eloquent
+ */
 class BaseModel extends Model
 {
 
@@ -13,11 +21,12 @@ class BaseModel extends Model
     protected $errorMessages = [];
 
     /**
-     * 添加错误信息
+     * 功    能：添加错误信息
+     * 修改日期：2019/7/25
      *
-     * @param string $message            
-     * @param int $code            
-     * @return $this
+     * @param string $message
+     * @param int $code
+     * @return bool
      */
     public function appendMessage(string $message, int $code = 0)
     {

@@ -39,7 +39,7 @@ class AdminAuthTableSeeder extends Seeder
                     'pid' => 0,
                     'name' => '内容管理',
                     'controller' => 'content',
-                    'action' => 'index',
+                    'action' => 'manage',
                     'sequence' => 15,
                     'note' => '内容管理',
                     'icon' => 'layui-icon-read'
@@ -372,6 +372,16 @@ class AdminAuthTableSeeder extends Seeder
                     'action' => 'delete',
                     'sequence' => 245,
                     'note' => '删除跳转栏目',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 130,
+                    'pid' => 3,
+                    'name' => '内容首页',
+                    'controller' => 'content',
+                    'action' => 'list',
+                    'sequence' => 250,
+                    'note' => '快速审核',
                     'icon' => ''
                 ],
                 [
@@ -792,6 +802,86 @@ class AdminAuthTableSeeder extends Seeder
                     'action' => 'delete',
                     'sequence' => 1205,
                     'note' => '附件删除',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1042,
+                    'pid' => 130,
+                    'name' => '内容管理',
+                    'controller' => 'content',
+                    'action' => 'index',
+                    'sequence' => 1210,
+                    'note' => '浏览某个栏目的内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1043,
+                    'pid' => 130,
+                    'name' => '审核',
+                    'controller' => 'content',
+                    'action' => 'audit',
+                    'sequence' => 1215,
+                    'note' => '审核内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1044,
+                    'pid' => 130,
+                    'name' => '添加内容',
+                    'controller' => 'content',
+                    'action' => 'add',
+                    'sequence' => 1220,
+                    'note' => '添加内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1045,
+                    'pid' => 130,
+                    'name' => '查看内容',
+                    'controller' => 'content',
+                    'action' => 'info',
+                    'sequence' => 1225,
+                    'note' => '查看内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1046,
+                    'pid' => 130,
+                    'name' => '修改内容',
+                    'controller' => 'content',
+                    'action' => 'edit',
+                    'sequence' => 1530,
+                    'note' => '修改内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1047,
+                    'pid' => 130,
+                    'name' => '删除内容',
+                    'controller' => 'content',
+                    'action' => 'delete',
+                    'sequence' => 1235,
+                    'note' => '删除内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1048,
+                    'pid' => 130,
+                    'name' => '快速编辑',
+                    'controller' => 'content',
+                    'action' => 'quickEdit',
+                    'sequence' => 1240,
+                    'note' => '快速编辑内容',
+                    'icon' => ''
+                ],
+                [
+                    'id' => 1049,
+                    'pid' => 130,
+                    'name' => '移动',
+                    'controller' => 'content',
+                    'action' => 'move',
+                    'sequence' => 1245,
+                    'note' => '移动内容到某栏目',
                     'icon' => ''
                 ],
                 [

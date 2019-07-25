@@ -9,7 +9,7 @@
 				<select name="pid" id="pid" lay-filter="pid" style="width: 300px">
 					<option value="0">=====顶级栏目=====</option>
 					@foreach($categoryList as $value)
-					<option value="{{ $value['id'] }}" @if(isset($info) && $info['pid']==$value['id'])selected @endif>{{ $value['cname'] }}</option>
+					<option value="{{ $value['id'] }}" @if(isset($info) && $info['pid']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
 					@endforeach
 				</select>
 			</div>
@@ -72,7 +72,7 @@
          		<script src="/lib/ueditor/ueditor.all.js" type="text/javascript"></script>
          		<script src="/lib/ueditor/lang/zh-cn/zh-cn.js" type="text/javascript"></script>
          		<script name="content" id="content" type="text/plain" style="width:100%; height:400px;">@if(isset($categoryPage) && !empty($categoryPage)){!! htmlspecialchars_decode($categoryPage->content) !!}@endif</script>
-         		<script type="text/javascript">UE.getEditor("content", {"serverUrl":"/admin/ueditor/index?origin=4"});</script>
+         		<script type="text/javascript">UE.getEditor("content", {"serverUrl":"/admin/ueditor/index?origin=1"});</script>
 			</div>
 			<div class="layui-form-mid layui-word-aux"></div>
 		</div>

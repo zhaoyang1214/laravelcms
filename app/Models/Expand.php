@@ -4,6 +4,26 @@ namespace App\Models;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
+/**
+ * App\Models\Expand
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand query()
+ * @mixin \Eloquent
+ * @property int $id
+ * @property string $table 模型表名称
+ * @property string $name 模型名称
+ * @property int $sequence 扩展模型排序，升序
+ * @property \Illuminate\Support\Carbon $create_time 创建时间
+ * @property \Illuminate\Support\Carbon|null $update_time 修改时间
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereCreateTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereSequence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereTable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Expand whereUpdateTime($value)
+ */
 class Expand extends BaseModel
 {
 

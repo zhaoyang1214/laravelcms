@@ -26,7 +26,7 @@
 			<tr>
 				<td><center>{{ $data['id'] }}</center></td>
                 <td>
-                <a href="/category/{{ $data['urlname'] }}" target="_blank">{{ $data['cname'] }}</a>
+                <a href="/category/{{ $data['urlname'] }}" target="_blank">{!! $data['cname'] !!}</a>
                 @if(!empty($data['image']))
                 <a href="javascript:;" rel="{{ $data['image'] }}" class="class_pic"><img align="AbsMiddle" src="/admin/images/ico/pic.png" width="14" height="14" alt="{{ $data['name'] }}" /></a>
                 @endif
