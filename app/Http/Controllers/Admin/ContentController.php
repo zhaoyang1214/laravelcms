@@ -371,4 +371,120 @@ class ContentController extends Controller
         $cws->close();
         return response()->json($result == false ? [] : $result);
     }
+
+    public function quickEdit(Request $request, $id = null)
+    {
+        if ($request->isMethod('post')) {
+            try {
+                DB::beginTransaction();
+                $data = $request->post();
+                unset($data['_token']);
+                $content = new Content();
+                $content = $content->edit($data['id'], $data);
+                if (!$content) {
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => $content->getMessages()[0]['message'],
+                    ]);
+                }
+                $contentId = $content->id;
+                $position = isset($data['position']) && is_array($data['position']) ? $data['position'] : [];
+                $contentPostionList = ContentPosition::where('content_id', $contentId)->get()->toArray();
+                $oldPostionIds = array_column($contentPostionList, 'position_id');
+                $addData = array_values(array_diff($position, $oldPostionIds));
+                $delData = array_values(array_diff($oldPostionIds, $position));
+                if (!empty($addData)) {
+                    $addRes = (new ContentPosition())->addByArr($addData, $contentId);
+                    if (! $addRes) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '添加失败'
+                        ]);
+                    }
+                }
+                if (!empty($delData)) {
+                    $delRes = ContentPosition::where('content_id', $contentId)
+                        ->whereIn('position_id', $delData)
+                        ->delete();
+                    if (! $delRes) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '删除推荐位失败'
+                        ]);
+                    }
+                }
+                $keywords = empty($data['keywords']) ? [] : explode(',', $data['keywords']);
+                $nowDate = date('Y-m-d H:i:s');
+                $tagsIds = [];
+                foreach ($keywords as $keyword) {
+                    $tags = Tags::firstOrCreate(['name' => $keyword], [
+                        'create_time' => $nowDate,
+                        'update_time' => $nowDate,
+                    ]);
+                    if (!$tags) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '添加失败'
+                        ]);
+                    }
+                    $tagsIds[] = $tags->id;
+                }
+                $contentTagsList = ContentTags::where('content_id', $contentId)->get()->toArray();
+                $oldTagsIds = array_column($contentTagsList, 'tags_id');
+                $tagsIntersect = array_values(array_intersect($tagsIds, $oldTagsIds));
+                $addTagsData = array_values(array_diff($tagsIds, $tagsIntersect));
+                $delTagsData = array_values(array_diff($oldTagsIds, $tagsIntersect));
+                if (!empty($addTagsData)) {
+                    $res = (new ContentTags())->addByArr($addTagsData, $contentId);
+                    if (!$res) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '添加失败'
+                        ]);
+                    }
+                }
+                if (!empty($delTagsData)) {
+                    $delRes = ContentTags::where('content_id', $contentId)
+                        ->whereIn('tags_id', $delTagsData)
+                        ->delete();
+                    if (! $delRes) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '删除关键词失败'
+                        ]);
+                    }
+                }
+                DB::commit();
+                return response()->json([
+                    'status' => 10000,
+                    'message' => '添加成功'
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 10001,
+                    'message' => '修改失败'
+                ]);
+            }
+        }
+        $info = Content::find($id);
+        if (! $info) {
+            return redirect('errors/404');
+        }
+        $positionList = Position::get();
+        $contentAuditPower = (new Admin())->checkPower('content', 'audit');
+        $actionUrl = '/admin/content/quickEdit';
+        $actionName = '添加';
+        return view('admin.content.quickEdit', compact(
+            'info',
+            'positionList',
+            'contentAuditPower',
+            'actionUrl',
+            'actionName'
+        ));
+    }
 }

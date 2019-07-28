@@ -132,7 +132,7 @@
 						@endforeach
 					@endif
 					@if ($contentQuickEditPower)
-					<a class="layui-btn layui-btn-normal layui-btn-xs quickeditor" style=" display:none" onclick="x_admin_show('快速编辑','content/quickEdit/{{ $data->id }}', 850)">[快速编辑]</a>
+					<a class="layui-btn layui-btn-normal layui-btn-xs quickeditor" style=" display:none" onclick="x_admin_show('快速编辑','/admin/content/quickEdit/{{ $data->id }}', 850)">[快速编辑]</a>
 					@endif
 				</td>
 				<td><a href="#">{{ $data->category_name }}</a></td>

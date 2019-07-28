@@ -94,7 +94,7 @@ class Content extends BaseModel
             $data['urltitle'] = $urltitle;
         }
         if (self::where('urltitle', $data['urltitle'])->count()) {
-            return $this->appendMessage('该栏目url已存在');
+            return $this->appendMessage('该内容url已存在');
         }
         if (empty($data['updatetime'])) {
             $data['updatetime'] = date('Y-m-d H:i:s');
@@ -103,5 +103,33 @@ class Content extends BaseModel
             $data['position'] = implode(',', $data['position']);
         }
         return self::create($data);
+    }
+
+    public function edit($id, $data)
+    {
+        $info = self::find($id);
+        if (empty($info)) {
+            return $this->appendMessage('内容不存在');
+        }
+        if (empty($data['title'])) {
+            return $this->appendMessage('标题不能为空');
+        }
+        if (empty($data['urltitle'])) {
+            $pinyin = new Pinyin();
+            $urltitle = $pinyin->permalink($data['title'], '');
+            if (strlen($urltitle) > 100) {
+                $urltitle = substr($urltitle, 0, 68) . md5(substr($urltitle, 68));
+            }
+            $data['urltitle'] = $urltitle;
+        }
+        if (self::where('urltitle', $data['urltitle'])->where('id', '<>', $id)->count()) {
+            return $this->appendMessage('该内容url已存在');
+        }
+        if (empty($data['updatetime'])) {
+            $data['updatetime'] = date('Y-m-d H:i:s');
+        }
+        $data['position'] = implode(',', $data['position']);
+        $res = $info->fill($data)->save();
+        return $res === false ? false : $info;
     }
 }

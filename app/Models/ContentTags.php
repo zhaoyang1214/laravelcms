@@ -26,4 +26,15 @@ class ContentTags extends BaseModel
         'content_id',
         'tags_id'
     ];
+
+    public function addByArr($tagsArr, $contentId)
+    {
+        $tagsArr = array_map(function ($v) use ($contentId) {
+            return [
+                'content_id' => $contentId,
+                'tags_id' => $v
+            ];
+        }, $tagsArr);
+        return self::insert($tagsArr);
+    }
 }
