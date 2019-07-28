@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Overtrue\Pinyin\Pinyin;
+
 /**
  * App\Models\Content
  *
@@ -77,4 +79,29 @@ class Content extends BaseModel
         'position',
         'taglink'
     ];
+
+    public function add($data)
+    {
+        if (empty($data['title'])) {
+            return $this->appendMessage('标题不能为空');
+        }
+        if (empty($data['urltitle'])) {
+            $pinyin = new Pinyin();
+            $urltitle = $pinyin->permalink($data['title'], '');
+            if (strlen($urltitle) > 100) {
+                $urltitle = substr($urltitle, 0, 68) . md5(substr($urltitle, 68));
+            }
+            $data['urltitle'] = $urltitle;
+        }
+        if (self::where('urltitle', $data['urltitle'])->count()) {
+            return $this->appendMessage('该栏目url已存在');
+        }
+        if (empty($data['updatetime'])) {
+            $data['updatetime'] = date('Y-m-d H:i:s');
+        }
+        if (!empty($data['position']) && is_array($data['position'])) {
+            $data['position'] = implode(',', $data['position']);
+        }
+        return self::create($data);
+    }
 }

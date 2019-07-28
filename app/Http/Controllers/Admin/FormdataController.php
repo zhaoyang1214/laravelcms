@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Form;
-use App\Models\Formdata;
+use App\Models\FormData;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Models\FormField;
@@ -18,7 +18,7 @@ class FormdataController extends Controller
         if (empty($formInfo)) {
             return redirect('errors/404');
         }
-        $formData = new Formdata($formInfo->table);
+        $formData = new FormData($formInfo->table);
         if (! empty($formInfo->sort)) {
             $sortArr = explode(',', $formInfo->sort);
             foreach ($sortArr as $sort) {

@@ -13,10 +13,10 @@
 				<div class="layui-form-item">
         			<label for="pid" class="layui-form-label form-label-medium">上级栏目</label>
         			<div class="layui-input-inline input-xlarge">
-        				<select name="pid" id="pid" lay-filter="pid" style="width: 300px">
+        				<select name="category_id" id="category_id" lay-filter="category_id" style="width: 300px">
         					<option value="0">=====顶级栏目=====</option>
         					@foreach($categoryList as $value)
-        					<option value="{{ $value['id'] }}" @if($value['type']==1 || $value['category_model_id'] != $category->category_model_id)disabled @endif @if(isset($info) && $info['pid']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
+        					<option value="{{ $value['id'] }}" @if($value['type']==1 || $value['category_model_id'] != $category->category_model_id)disabled @endif @if(isset($info) && $info['category_id']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
         					@endforeach
         				</select>
         			</div>
@@ -111,12 +111,84 @@
         				<input type="checkbox" id="taglink" name="taglink"  value="1" title='内容自动链接' @if(isset($info->taglink) && $info->taglink==1)checked="checked"@endif  class='keep'>
         			</div>
         		</div>
+                @if($contentAuditPower)
+                <div class="layui-form-item layui-form-text">
+                    <label for="status" class="layui-form-label form-label-medium">状态</label>
+                    <div class="layui-input-inline input-xlarge">
+						<input type='radio' name='status' value='1' title='发布' @if(isset($info) && $info->status == 1)checked @endif>
+						<input type='radio' name='status' value='0' title='草稿' @if(!isset($info) || $info->status == 0)checked @endif>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">
+                    </div>
+                </div>
+                @endif
 		</div>
 		<div class="layui-tab-item">
-				2
+			<div class="layui-form-item">
+				<label for="subtitle" class="layui-form-label form-label-medium">副标题</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="subtitle" name="subtitle" value="@isset($info){{ $info->subtitle }}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="urltitle" class="layui-form-label form-label-medium">英文URL名称</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="urltitle" name="urltitle" value="@isset($info){{ $info->urltitle }}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="views" class="layui-form-label form-label-medium">访问量</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="views" name="views" value="@isset($info){{ $info->views }}@else{{0}}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+					内容浏览量
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="sequence" class="layui-form-label form-label-medium">顺序</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="sequence" name="sequence" value="@isset($info){{ $info->sequence }}@else{{0}}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+					(自定义顺序，升序)
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="jump_url" class="layui-form-label form-label-medium">跳转到</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="jump_url" name="jump_url" value="@isset($info){{ $info->jump_url }}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+					URL链接
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="update_time" class="layui-form-label form-label-medium">更新时间</label>
+				<div class="layui-input-inline input-xlarge">
+					<input type="text" id="update_time" name="update_time" value="@isset($info){{ $info->update_time }}@else{{date('Y-m-d H:i:s')}}@endisset" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+				</div>
+			</div>
+            <div class="layui-form-item">
+                <label for="tpl" class="layui-form-label form-label-medium">内容模板</label>
+                <div class="layui-input-inline input-xlarge">
+                    <input type="text" id="tpl" name="tpl" value="@isset($info){{ $info->tpl }}@endisset" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    留空采用栏目指定模板
+                </div>
+            </div>
 		</div>
 		<div class="layui-tab-item">
-				3
+            @foreach($expandFieldList as $expandField)
+                {!! $expandField->getFieldHtml($expandData ?? null) !!}
+            @endforeach
 		</div>
 	</div>
 </div>
@@ -132,15 +204,20 @@
 </div>
 </form>
 <script type="text/javascript">
-layui.use(['form'], function(){
+layui.use(['form', 'laydate'], function(){
   	var form = layui.form
   	var layer = layui.layer;
+    var laydate = layui.laydate;
+
+    laydate.render({
+        elem: '#update_time',
+        type: 'datetime',
+        format: "yyyy-MM-dd HH:mm:ss"
+    });
 
   //监听提交
   form.on('submit(submit)', function(data){
 	  var requestData = data.field;
-	  console.log(requestData);
-	  return false;
       $.ajax({
 			type:'post',
 			url:'{{ $actionUrl }}',

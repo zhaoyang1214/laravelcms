@@ -65,7 +65,7 @@
 					<span>{{ $data->title }}</span>
 					@if (!empty($data->position))
 						@foreach (explode(',', $data->position) as $value)
-						<span color="red">[{{ $positionList[$value]['name'] }}]</span>
+						<font color="red">[{{ $positionList[$value]['name'] }}]</font>
 						@endforeach
 					@endif
 					@if ($contentQuickEditPower)

@@ -3,6 +3,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\ContentData;
+use App\Models\ContentPosition;
+use App\Models\ContentTags;
+use App\Models\Expand;
+use App\Models\ExpandData;
+use App\Models\Tags;
 use Illuminate\Http\Request;
 use App\Models\Content;
 use App\Models\Category;
@@ -10,6 +16,7 @@ use App\Models\Position;
 use App\Models\AdminAuth;
 use App\Models\ExpandField;
 use App\Models\CategoryModel;
+use Illuminate\Support\Facades\DB;
 use SCWS\PSCWS4;
 
 class ContentController extends Controller
@@ -245,8 +252,81 @@ class ContentController extends Controller
     public function add(Request $request, $categoryId = null)
     {
         if ($request->isMethod('post')) {
-            dump($request->post());
-            exit();
+            try {
+                DB::beginTransaction();
+                $data = $request->post();
+                unset($data['content'], $data['_token']);
+                $content = new Content();
+                $content = $content->add($data);
+                if (! $content) {
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '添加失败'
+                    ]);
+                }
+                $contentId = $content->id;
+                $contentData = [
+                    'content_id' => $contentId,
+                    'content' => htmlspecialchars($request->post('content', ''))
+                ];
+                $contentData = ContentData::create($contentData);
+                if (! $contentData) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '添加失败'
+                    ]);
+                }
+                $category = Category::find($content->category_id);
+                if (!empty($category->expand_id)) {
+                    $expand = Expand::find($category->expand_id);
+                    if ($expand) {
+                        $expandData = new ExpandData($expand->table);
+                        $res = $expandData->add($data, $expand->id);
+                        if (! $res) {
+                            DB::rollBack();
+                            return response()->json([
+                                'status' => 10001,
+                                'message' => $expandData->getMessages()[0]['message'],
+                            ]);
+                        }
+                    }
+                }
+                if (isset($data['position']) && !empty($data['position']) && is_array($data['position'])) {
+                    $addRes = (new ContentPosition())->addByArr($data['position'], $contentId);
+                    if (! $addRes) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '添加失败'
+                        ]);
+                    }
+                }
+                if (!empty($data['keywords'])) {
+                    $keywords = explode(',', $data['keywords']);
+                    $nowDate = date('Y-m-d H:i:s');
+                    foreach ($keywords as $keyword) {
+                        $tags = Tags::firstOrCreate(['name' => $keyword], [
+                            'create_time' => $nowDate,
+                            'update_time' => $nowDate,
+                        ]);
+                        ContentTags::insert([
+                            'content_id' => $contentId,
+                            'tags_id' => $tags->id,
+                        ]);
+                    }
+                }
+                DB::commit();
+                return response()->json([
+                    'status' => 10000,
+                    'message' => '添加成功'
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 10001,
+                    'message' => '添加失败'
+                ]);
+            }
         }
         $category = Category::find($categoryId);
         if (empty($category)) {
@@ -260,7 +340,7 @@ class ContentController extends Controller
         $contentAuditPower = $admin->checkPower('content', 'audit');
         $categoryList = (new Category())->getAllowList();
         $positionList = Position::get();
-        $expandFieldList = ExpandField::where('expand_id', $category->id)->get();
+        $expandFieldList = ExpandField::where('expand_id', $category->expand_id)->get();
         $categoryModel = CategoryModel::find($category->category_model_id);
         return view('admin.content.info', compact(
             'category',
