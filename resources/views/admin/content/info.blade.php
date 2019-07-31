@@ -11,10 +11,10 @@
 	<div class="layui-tab-content">
 		<div class="layui-tab-item layui-show">
 				<div class="layui-form-item">
-        			<label for="pid" class="layui-form-label form-label-medium">上级栏目</label>
+        			<label for="pid" class="layui-form-label form-label-medium">栏目</label>
         			<div class="layui-input-inline input-xlarge">
         				<select name="category_id" id="category_id" lay-filter="category_id" style="width: 300px">
-        					<option value="0">=====顶级栏目=====</option>
+        					<option value="0">=====选择栏目=====</option>
         					@foreach($categoryList as $value)
         					<option value="{{ $value['id'] }}" @if($value['type']==1 || $value['category_model_id'] != $category->category_model_id)disabled @endif @if(isset($info) && $info['category_id']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
         					@endforeach
@@ -170,7 +170,7 @@
 			<div class="layui-form-item">
 				<label for="update_time" class="layui-form-label form-label-medium">更新时间</label>
 				<div class="layui-input-inline input-xlarge">
-					<input type="text" id="update_time" name="update_time" value="@isset($info){{ $info->update_time }}@else{{date('Y-m-d H:i:s')}}@endisset" autocomplete="off" class="layui-input">
+					<input type="text" id="update_time" name="update_time" value="" class="layui-input">
 				</div>
 				<div class="layui-form-mid layui-word-aux">
 				</div>
@@ -212,6 +212,7 @@ layui.use(['form', 'laydate'], function(){
     laydate.render({
         elem: '#update_time',
         type: 'datetime',
+        trigger: 'click',
         format: "yyyy-MM-dd HH:mm:ss"
     });
 

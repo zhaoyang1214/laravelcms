@@ -56,9 +56,7 @@ class Content extends BaseModel
 
     protected $table = 'content';
 
-    const CREATED_AT = 'input_time';
-
-    const UPDATED_AT = 'update_time';
+    public $timestamps = false;
 
     protected $fillable = [
         'category_id',
@@ -96,12 +94,14 @@ class Content extends BaseModel
         if (self::where('urltitle', $data['urltitle'])->count()) {
             return $this->appendMessage('该内容url已存在');
         }
-        if (empty($data['updatetime'])) {
-            $data['updatetime'] = date('Y-m-d H:i:s');
+        $nowDate = date('Y-m-d H:i:s');
+        if (empty($data['update_time'])) {
+            $data['update_time'] = $nowDate;
         }
         if (!empty($data['position']) && is_array($data['position'])) {
             $data['position'] = implode(',', $data['position']);
         }
+        $data['input_time'] = $nowDate;
         return self::create($data);
     }
 
@@ -125,10 +125,11 @@ class Content extends BaseModel
         if (self::where('urltitle', $data['urltitle'])->where('id', '<>', $id)->count()) {
             return $this->appendMessage('该内容url已存在');
         }
-        if (empty($data['updatetime'])) {
-            $data['updatetime'] = date('Y-m-d H:i:s');
+        if (empty($data['update_time'])) {
+            $data['update_time'] = date('Y-m-d H:i:s');
         }
         $data['position'] = implode(',', $data['position']);
+        $info->update_time = $data['update_time'];
         $res = $info->fill($data)->save();
         return $res === false ? false : $info;
     }

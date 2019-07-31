@@ -51,7 +51,7 @@
         <div class="layui-form-item">
             <label for="update_time" class="layui-form-label form-label-medium">更新时间</label>
             <div class="layui-input-inline input-xlarge">
-                <input type="text" id="update_time" name="update_time" value="@isset($info){{ $info->update_time }}@else{{date('Y-m-d H:i:s')}}@endisset" autocomplete="off" class="layui-input">
+                <input type="text" id="update_time" name="update_time" value="" class="layui-input">
             </div>
             <div class="layui-form-mid layui-word-aux">
             </div>
@@ -84,6 +84,7 @@ layui.use(['form', 'laydate'], function(){
 
     laydate.render({
         elem: '#update_time',
+        trigger: 'click',
         type: 'datetime',
         format: "yyyy-MM-dd HH:mm:ss"
     });

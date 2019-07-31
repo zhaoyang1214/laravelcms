@@ -88,7 +88,7 @@
 		<button class="layui-btn audit" data-status="0">草稿</button>
 		@endif
 		@if($contentDeletePower)
-		<button class="layui-btn delete">删除</button>
+		<button class="layui-btn del">删除</button>
 		@endif
 		@if($contentMovePower)
 		<div class="layui-inline">
@@ -184,19 +184,25 @@ layui.use(['laypage', 'layer', 'jquery', 'form'], function(){
 	}
   });
   
-  $("#del").click(function(){
-	  var data = tableCheck.getData();
-	  console.log(data);
-	  if(data.length <= 0) {
-		  layer.msg('请选择要删除的内容');
-	  } 
-	  var ids = '';
-	  for(var i=0; i<data.length; i++) {
-		  if(i > 0) {
-			  ids += ',';
-		  }
-		  ids += data[i];
-	  }
+  $(".del").click(function(){
+      var ids = '';
+      var obj = '';
+      if ($(this)[0].hasAttribute('data-id')) {
+          ids = $(this).attr('data-id');
+          obj = $(this);
+	  } else {
+          var data = tableCheck.getData();
+          if(data.length <= 0) {
+              layer.msg('请选择要删除的内容');
+              return false;
+          }
+          for(var i=0; i<data.length; i++) {
+              if(i > 0) {
+                  ids += ',';
+              }
+              ids += data[i];
+          }
+      }
 	  layer.confirm('确认要删除选中的内容吗？',function(index){
 		  $.ajax({
   			type:'post',
@@ -205,8 +211,12 @@ layui.use(['laypage', 'layer', 'jquery', 'form'], function(){
   			dataType: "json",
   			success: function(data){
   				if(data.status == 10000) {
-  					  $(".layui-form-checked").not('.header').parents('tr').remove();
-      		          layer.msg('删除成功!',{icon:1,time:1000});
+						if (typeof obj === 'object') {
+                            obj.parents('tr').remove();
+						} else {
+                            $(".layui-form-checked").not('.header').parents('tr').remove();
+						}
+      		          	layer.msg('删除成功!',{icon:1,time:1000});
                   } else {
                  		layer.msg(data.message);
                   }

@@ -282,6 +282,7 @@ class ContentController extends Controller
                     $expand = Expand::find($category->expand_id);
                     if ($expand) {
                         $expandData = new ExpandData($expand->table);
+                        $data['id'] = $contentId;
                         $res = $expandData->add($data, $expand->id);
                         if (! $res) {
                             DB::rollBack();
@@ -399,7 +400,7 @@ class ContentController extends Controller
                         DB::rollBack();
                         return response()->json([
                             'status' => 10001,
-                            'message' => '添加失败'
+                            'message' => '修改失败'
                         ]);
                     }
                 }
@@ -427,7 +428,7 @@ class ContentController extends Controller
                         DB::rollBack();
                         return response()->json([
                             'status' => 10001,
-                            'message' => '添加失败'
+                            'message' => '修改失败'
                         ]);
                     }
                     $tagsIds[] = $tags->id;
@@ -443,7 +444,7 @@ class ContentController extends Controller
                         DB::rollBack();
                         return response()->json([
                             'status' => 10001,
-                            'message' => '添加失败'
+                            'message' => '修改失败'
                         ]);
                     }
                 }
@@ -462,7 +463,7 @@ class ContentController extends Controller
                 DB::commit();
                 return response()->json([
                     'status' => 10000,
-                    'message' => '添加成功'
+                    'message' => '修改成功'
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
@@ -478,7 +479,7 @@ class ContentController extends Controller
         $positionList = Position::get();
         $contentAuditPower = (new Admin())->checkPower('content', 'audit');
         $actionUrl = '/admin/content/quickEdit';
-        $actionName = '添加';
+        $actionName = '保存';
         return view('admin.content.quickEdit', compact(
             'info',
             'positionList',
@@ -486,5 +487,266 @@ class ContentController extends Controller
             'actionUrl',
             'actionName'
         ));
+    }
+
+    public function audit(Request $request)
+    {
+        $status = $request->post('status', 0);
+        $ids = trim($request->post('ids'), ',');
+        if (empty($ids)) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '未选中要修改的记录'
+            ]);
+        }
+        $idArr = explode(',', $ids);
+        $res = Content::whereKey($idArr)->update(['status' => $status]);
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '修改成功'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 10001,
+                'message' => '修改失败'
+            ]);
+        }
+    }
+
+    public function info($id)
+    {
+        $info = Content::find($id);
+        if (!$info) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '内容不存在'
+            ]);
+        }
+        $category = Category::find($info->category_id);
+        if (!$category) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '栏目不存在'
+            ]);
+        }
+        $contentData = ContentData::where('content_id', $id)->first();
+        $expandData = null;
+        if ($category->expand_id) {
+            $expand = Expand::find($category->expand_id);
+            if ($expand) {
+                $expandData = new ExpandData($expand->table);
+                $expandData = $expandData::find($id);
+                $expandData = $expandData === false ? null : $expandData;
+            }
+        }
+        $admin = new Admin();
+        $actionUrl = '/admin/content/edit';
+        $action = 'edit';
+        $actionName = '修改';
+        $actionPower = $admin->checkPower('content', 'edit');
+        $contentAuditPower = $admin->checkPower('content', 'audit');
+        $categoryList = (new Category())->getAllowList();
+        $positionList = Position::get();
+        $expandFieldList = ExpandField::where('expand_id', $category->expand_id)->get();
+        $categoryModel = CategoryModel::find($category->category_model_id);
+        return view('admin.content.info', compact(
+            'category',
+            'actionUrl',
+            'action',
+            'actionName',
+            'actionPower',
+            'contentAuditPower',
+            'categoryList',
+            'positionList',
+            'expandFieldList',
+            'categoryModel',
+            'info',
+            'contentData',
+            'expandData'
+        ));
+    }
+
+    public function edit(Request $request)
+    {
+        $data = $request->post();
+        unset($data['_token']);
+        try {
+            DB::beginTransaction();
+            $contentM = new Content();
+            $content = $contentM->edit($data['id'], $data);
+            if (!$content) {
+                return response()->json([
+                    'status' => 10001,
+                    'message' => $contentM->getMessages()[0]['message'] ?? '修改失败',
+                ]);
+            }
+            $contentId = $content->id;
+            $contentData = [
+                'content' => htmlspecialchars($request->post('content', ''))
+            ];
+            ContentData::where('content_id', $contentId)->update($contentData);
+            $category = Category::find($content->category_id);
+            if (!empty($category->expand_id)) {
+                $expand = Expand::find($category->expand_id);
+                if ($expand) {
+                    $expandData = new ExpandData($expand->table);
+                    $data['expand_id'] = $expand->id;
+                    $res = $expandData->edit($data);
+                    if (! $res) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 10001,
+                            'message' => '修改失败'
+                        ]);
+                    }
+                }
+            }
+            $position = isset($data['position']) && is_array($data['position']) ? $data['position'] : [];
+            $contentPostionList = ContentPosition::where('content_id', $contentId)->get()->toArray();
+            $oldPostionIds = array_column($contentPostionList, 'position_id');
+            $addData = array_values(array_diff($position, $oldPostionIds));
+            $delData = array_values(array_diff($oldPostionIds, $position));
+            if (!empty($addData)) {
+                $addRes = (new ContentPosition())->addByArr($addData, $contentId);
+                if (! $addRes) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '修改失败'
+                    ]);
+                }
+            }
+            if (!empty($delData)) {
+                $delRes = ContentPosition::where('content_id', $contentId)
+                    ->whereIn('position_id', $delData)
+                    ->delete();
+                if (! $delRes) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '删除推荐位失败'
+                    ]);
+                }
+            }
+            $keywords = empty($data['keywords']) ? [] : explode(',', $data['keywords']);
+            $nowDate = date('Y-m-d H:i:s');
+            $tagsIds = [];
+            foreach ($keywords as $keyword) {
+                $tags = Tags::firstOrCreate(['name' => $keyword], [
+                    'create_time' => $nowDate,
+                    'update_time' => $nowDate,
+                ]);
+                if (!$tags) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '修改失败'
+                    ]);
+                }
+                $tagsIds[] = $tags->id;
+            }
+            $contentTagsList = ContentTags::where('content_id', $contentId)->get()->toArray();
+            $oldTagsIds = array_column($contentTagsList, 'tags_id');
+            $tagsIntersect = array_values(array_intersect($tagsIds, $oldTagsIds));
+            $addTagsData = array_values(array_diff($tagsIds, $tagsIntersect));
+            $delTagsData = array_values(array_diff($oldTagsIds, $tagsIntersect));
+            if (!empty($addTagsData)) {
+                $res = (new ContentTags())->addByArr($addTagsData, $contentId);
+                if (!$res) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '修改失败'
+                    ]);
+                }
+            }
+            if (!empty($delTagsData)) {
+                $delRes = ContentTags::where('content_id', $contentId)
+                    ->whereIn('tags_id', $delTagsData)
+                    ->delete();
+                if (! $delRes) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 10001,
+                        'message' => '删除关键词失败'
+                    ]);
+                }
+            }
+            DB::commit();
+            return response()->json([
+                'status' => 10000,
+                'message' => '修改成功'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '修改失败'
+            ]);
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        $ids = trim($request->post('ids'), ',');
+        if (empty($ids)) {
+            response()->json([
+                'status' => 10001,
+                'message' => '未选中要删除的记录'
+            ]);
+        }
+        $idArr = explode(',', $ids);
+        $list = Content::whereIn('id', $idArr)->get();
+        if (empty($list)) {
+            response()->json([
+                'status' => 10001,
+                'message' => '选中的记录不存在'
+            ]);
+        }
+        try {
+            DB::beginTransaction();
+            foreach ($list as $content) {
+                $contentId = $content->id;
+                $res = ContentData::where('content_id', $contentId)->delete();
+                if (!$res) {
+                    response()->json([
+                        'status' => 10001,
+                        'message' => '删除失败'
+                    ]);
+                }
+                $category = Category::find($content->category_id);
+                if (!empty($category->expand_id)) {
+                    $expand = Expand::find($category->expand_id);
+                    if ($expand) {
+                        $expandData = new ExpandData($expand->table);
+                        $expandData::where('id', $contentId)->delete();
+                    }
+                }
+                if (!empty($content->position)) {
+                    ContentPosition::where('content_id', $contentId)->delete();
+                }
+                if (!empty($content->keywords)) {
+                    ContentTags::where('content_id', $contentId)->delete();
+                }
+                $res = $content->delete();
+                if (!$res) {
+                    DB::rollBack();
+                    response()->json([
+                        'status' => 10001,
+                        'message' => '删除失败'
+                    ]);
+                }
+            }
+            DB::commit();
+            return response()->json([
+                'status' => 10000,
+                'message' => '删除成功'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '删除失败'
+            ]);
+        }
     }
 }

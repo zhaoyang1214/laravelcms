@@ -16,10 +16,12 @@ class ExpandData extends BaseModel
 
     protected $table;
 
+//    protected $id;
+
     public $timestamps = false;
 
     protected $guarded = [
-        'id'
+//        'id'
     ];
 
     public function __construct($table = null)
@@ -112,6 +114,7 @@ class ExpandData extends BaseModel
             }
             $newData[$expandField->field] = $value;
         }
+        $newData['id'] = $data['id'];
         return $newData;
     }
 
@@ -121,7 +124,7 @@ class ExpandData extends BaseModel
         if ($data === false) {
             return false;
         }
-        $res = $this->fill($data)->save();
+        $res = self::insert($data);
         if (! $res) {
             return $this->appendMessage('添加失败');
         }
