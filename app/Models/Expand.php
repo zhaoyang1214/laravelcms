@@ -48,6 +48,8 @@ class Expand extends BaseModel
         }
         Schema::create($table, function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('content_id', false, true);
+            $table->unique('content_id', 'content_id');
         });
         return self::create($data);
     }

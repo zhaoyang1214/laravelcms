@@ -282,13 +282,13 @@ class ContentController extends Controller
                     $expand = Expand::find($category->expand_id);
                     if ($expand) {
                         $expandData = new ExpandData($expand->table);
-                        $data['id'] = $contentId;
+                        $data['content_id'] = $contentId;
                         $res = $expandData->add($data, $expand->id);
                         if (! $res) {
                             DB::rollBack();
                             return response()->json([
                                 'status' => 10001,
-                                'message' => $expandData->getMessages()[0]['message'],
+                                'message' => $expandData->getMessages()[0]['message'] ?? '添加失败',
                             ]);
                         }
                     }
@@ -536,7 +536,7 @@ class ContentController extends Controller
             $expand = Expand::find($category->expand_id);
             if ($expand) {
                 $expandData = new ExpandData($expand->table);
-                $expandData = $expandData::find($id);
+                $expandData = $expandData::where('content_id', $id)->first();
                 $expandData = $expandData === false ? null : $expandData;
             }
         }
@@ -591,8 +591,14 @@ class ContentController extends Controller
                 $expand = Expand::find($category->expand_id);
                 if ($expand) {
                     $expandData = new ExpandData($expand->table);
-                    $data['expand_id'] = $expand->id;
-                    $res = $expandData->edit($data);
+                    $data['content_id'] = $data['id'];
+                    unset($data['id']);
+                    $res = $expandData->edit($data, $expand->id);
+                    $errCode = $expandData->getMessages()[0]['code'] ?? 0;
+                    if ($errCode == 404) {
+                        $data['content_id'] = $contentId;
+                        $res = $expandData->add($data, $expand->id);
+                    }
                     if (! $res) {
                         DB::rollBack();
                         return response()->json([
@@ -719,7 +725,7 @@ class ContentController extends Controller
                     $expand = Expand::find($category->expand_id);
                     if ($expand) {
                         $expandData = new ExpandData($expand->table);
-                        $expandData::where('id', $contentId)->delete();
+                        $expandData::where('content_id', $contentId)->delete();
                     }
                 }
                 if (!empty($content->position)) {
@@ -746,6 +752,31 @@ class ContentController extends Controller
             return response()->json([
                 'status' => 10001,
                 'message' => '删除失败'
+            ]);
+        }
+    }
+
+    public function move(Request $request)
+    {
+        $categoryId = $request->post('category_id', 0);
+        $ids = trim($request->post('ids'), ',');
+        if (empty($ids)) {
+            return response()->json([
+                'status' => 10001,
+                'message' => '未选中要移动的记录'
+            ]);
+        }
+        $idArr = explode(',', $ids);
+        $res = Content::whereKey($idArr)->update(['category_id' => $categoryId]);
+        if ($res) {
+            return response()->json([
+                'status' => 10000,
+                'message' => '移动成功'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 10001,
+                'message' => '移动失败'
             ]);
         }
     }

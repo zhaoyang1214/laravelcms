@@ -78,7 +78,8 @@ class ExpandController extends Controller
     public function delete(Request $request)
     {
         $id = $request->post('id', 0);
-        $res = (new Expand())->deleteById($id);
+        $expand = new Expand();
+        $res = $expand->deleteById($id);
         if ($res) {
             return response()->json([
                 'status' => 10000,
@@ -87,7 +88,7 @@ class ExpandController extends Controller
         }
         return response()->json([
             'status' => 10001,
-            'message' => '删除失败'
+            'message' => $expand->getMessages()[0]['message'] ?? '删除失败'
         ]);
     }
 }

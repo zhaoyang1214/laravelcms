@@ -75,7 +75,9 @@ class Content extends BaseModel
         'copyfrom',
         'views',
         'position',
-        'taglink'
+        'taglink',
+        'input_time',
+        'update_time'
     ];
 
     public function add($data)
@@ -128,7 +130,7 @@ class Content extends BaseModel
         if (empty($data['update_time'])) {
             $data['update_time'] = date('Y-m-d H:i:s');
         }
-        $data['position'] = implode(',', $data['position']);
+        $data['position'] = isset($data['position']) ? implode(',', $data['position']) : '';
         $info->update_time = $data['update_time'];
         $res = $info->fill($data)->save();
         return $res === false ? false : $info;

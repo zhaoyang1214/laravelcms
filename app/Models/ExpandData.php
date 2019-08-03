@@ -114,35 +114,34 @@ class ExpandData extends BaseModel
             }
             $newData[$expandField->field] = $value;
         }
-        $newData['id'] = $data['id'];
         return $newData;
     }
 
     public function add(array $data, int $expandId)
     {
-        $data = $this->checkData($data, $expandId);
-        if ($data === false) {
+        $newData = $this->checkData($data, $expandId);
+        if ($newData === false) {
             return false;
         }
-        $res = self::insert($data);
+        $newData['content_id'] = $data['content_id'];
+        $res = self::insert($newData);
         if (! $res) {
             return $this->appendMessage('添加失败');
         }
         return $res;
     }
 
-    public function edit(array $data)
+    public function edit(array $data, int $expandId)
     {
-        $id = $data['id'] ?? 0;
-        $info = self::find($id);
+        $contentId = $data['content_id'] ?? 0;
+        $info = self::where('content_id', $contentId)->first();
         if (! $info) {
-            return $this->appendMessage('记录不存在');
+            return $this->appendMessage('记录不存在', 404);
         }
-        $data = $this->checkData($data, $data['expand_id']);
+        $data = $this->checkData($data, $expandId);
         if ($data === false) {
             return false;
         }
-        unset($data['id']);
         $res = $info->fill($data)->save();
         if (! $res) {
             return $this->appendMessage('修改失败');

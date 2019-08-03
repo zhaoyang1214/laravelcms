@@ -164,111 +164,150 @@ $('tr').hover(
 	}
 );
 layui.use(['laypage', 'layer', 'jquery', 'form'], function(){
-  var laypage = layui.laypage;
-  var layer = layui.layer;
-  var $ = layui.jquery;
-  var form = layui.form;
-  laypage.render({
-    elem: 'page',
-    count: {{ $datas->total() }},
-    limit: {{ $datas->perPage() }},
-    curr: {{ $datas->currentPage() }},
-    jump: function(obj, first){
-        if(!first) {
-        	layer.load();
-        	location.href = "/admin/content/index?page=" + obj.curr;
-        }
-        if(obj.count == 0) {
-			$("#page").hide();
-        }
-	}
-  });
-  
-  $(".del").click(function(){
-      var ids = '';
-      var obj = '';
-      if ($(this)[0].hasAttribute('data-id')) {
-          ids = $(this).attr('data-id');
-          obj = $(this);
-	  } else {
-          var data = tableCheck.getData();
-          if(data.length <= 0) {
-              layer.msg('请选择要删除的内容');
-              return false;
-          }
-          for(var i=0; i<data.length; i++) {
-              if(i > 0) {
-                  ids += ',';
-              }
-              ids += data[i];
-          }
-      }
-	  layer.confirm('确认要删除选中的内容吗？',function(index){
-		  $.ajax({
-  			type:'post',
-  			url:'/admin/content/delete',
-  			data:{ids:ids, _token:"{{ csrf_token() }}"},
-  			dataType: "json",
-  			success: function(data){
-  				if(data.status == 10000) {
-						if (typeof obj === 'object') {
-                            obj.parents('tr').remove();
-						} else {
-                            $(".layui-form-checked").not('.header').parents('tr').remove();
-						}
-      		          	layer.msg('删除成功!',{icon:1,time:1000});
-                  } else {
-                 		layer.msg(data.message);
-                  }
-  			},
-            error: function (XMLHttpResponse, textStatus, errorThrown) {
-          	    layer.msg('删除失败');
+    var laypage = layui.laypage;
+    var layer = layui.layer;
+    var $ = layui.jquery;
+    var form = layui.form;
+    laypage.render({
+        elem: 'page',
+        count: {{ $datas->total() }},
+        limit: {{ $datas->perPage() }},
+        curr: {{ $datas->currentPage() }},
+        jump: function(obj, first){
+            if(!first) {
+                layer.load();
+                location.href = "/admin/content/index?page=" + obj.curr;
             }
-  		});
-      	layer.msg('正在删除 . . .', {shade:0.2});
-      	return false;
-      });
-  });
-
-  $(".audit").click(function(){
-	  var data = tableCheck.getData();
-	  console.log(data);
-	  if(data.length <= 0) {
-		  layer.msg('请选择要操作的内容');
-		  return;
-	  } 
-	  var ids = '';
-	  for(var i=0; i<data.length; i++) {
-		  if(i > 0) {
-			  ids += ',';
-		  }
-		  ids += data[i];
-	  }
-	  var status = $(this).attr('data-status');
-	  console.log(status);
-	  $.ajax({
-		type:'post',
-		url:'/admin/content/audit',
-		data:{ids:ids,status:status,_token:"{{ csrf_token() }}"},
-		dataType: "json",
-		success: function(data){
-			if(data.status == 10000) {
-				window.location.reload();
-	          layer.msg('操作成功!',{icon:1,time:1000});
-          } else {
-         		layer.msg(data.message);
-          }
-		},
-    	error: function (XMLHttpResponse, textStatus, errorThrown) {
-      	    layer.msg('操作失败');
+            if(obj.count == 0) {
+                $("#page").hide();
+            }
         }
-	});
-  	layer.msg('正在操作 . . .', {shade:0.2});
-  });
+    });
 
-  form.on('submit(operate)',function(data){
-	    return false;
-	});
+    $(".del").click(function(){
+        var ids = '';
+        var obj = '';
+        if ($(this)[0].hasAttribute('data-id')) {
+            ids = $(this).attr('data-id');
+            obj = $(this);
+        } else {
+            var data = tableCheck.getData();
+            if(data.length <= 0) {
+                layer.msg('请选择要删除的内容');
+                return false;
+            }
+            for(var i=0; i<data.length; i++) {
+                if(i > 0) {
+                    ids += ',';
+                }
+                ids += data[i];
+            }
+        }
+        layer.confirm('确认要删除选中的内容吗？',function(index){
+            $.ajax({
+                type:'post',
+                url:'/admin/content/delete',
+                data:{ids:ids, _token:"{{ csrf_token() }}"},
+                dataType: "json",
+                success: function(data){
+                    if(data.status == 10000) {
+                        if (typeof obj === 'object') {
+                            obj.parents('tr').remove();
+                        } else {
+                            $(".layui-form-checked").not('.header').parents('tr').remove();
+                        }
+                        layer.msg('删除成功!',{icon:1,time:1000});
+                    } else {
+                        layer.msg(data.message);
+                    }
+                },
+                error: function (XMLHttpResponse, textStatus, errorThrown) {
+                    layer.msg('删除失败');
+                }
+            });
+            layer.msg('正在删除 . . .', {shade:0.2});
+            return false;
+        });
+    });
+
+    $(".audit").click(function(){
+        var data = tableCheck.getData();
+        console.log(data);
+        if(data.length <= 0) {
+            layer.msg('请选择要操作的内容');
+            return;
+        }
+        var ids = '';
+        for(var i=0; i<data.length; i++) {
+            if(i > 0) {
+                ids += ',';
+            }
+            ids += data[i];
+        }
+        var status = $(this).attr('data-status');
+        console.log(status);
+        $.ajax({
+            type:'post',
+            url:'/admin/content/audit',
+            data:{ids:ids,status:status,_token:"{{ csrf_token() }}"},
+            dataType: "json",
+            success: function(data){
+                if(data.status == 10000) {
+                    window.location.reload();
+                    layer.msg('操作成功!',{icon:1,time:1000});
+                } else {
+                    layer.msg(data.message);
+                }
+            },
+            error: function (XMLHttpResponse, textStatus, errorThrown) {
+                layer.msg('操作失败');
+            }
+        });
+        layer.msg('正在操作 . . .', {shade:0.2});
+    });
+
+    form.on('submit(operate)',function(data){
+        return false;
+    });
+
+    $("#move").click(function(){
+        var data = tableCheck.getData();
+        console.log(data);
+        if(data.length <= 0) {
+            layer.msg('请选择要操作的内容');
+            return;
+        }
+        var ids = '';
+        for(var i=0; i<data.length; i++) {
+            if(i > 0) {
+                ids += ',';
+            }
+            ids += data[i];
+        }
+        var categoryId = $("#category_id").val();
+        if (categoryId === 0) {
+            layer.msg('请选择栏目');
+            return;
+        }
+        $.ajax({
+            type:'post',
+            url:'/admin/content/move',
+            data:{ids:ids,category_id:categoryId,_token:"{{ csrf_token() }}"},
+            dataType: "json",
+            success: function(data){
+                if(data.status == 10000) {
+                    window.location.reload();
+                    layer.msg('操作成功!',{icon:1,time:1000});
+                } else {
+                    layer.msg(data.message);
+                }
+            },
+            error: function (XMLHttpResponse, textStatus, errorThrown) {
+                layer.msg('操作失败');
+            }
+        });
+        layer.msg('正在操作 . . .', {shade:0.2});
+    });
 });
 </script>
 @endsection

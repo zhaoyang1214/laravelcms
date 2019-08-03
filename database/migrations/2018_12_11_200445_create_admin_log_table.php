@@ -18,6 +18,7 @@ class CreateAdminLogTable extends Migration
             $table->mediumInteger('admin_id', false, true)->comment('表admin id');
             $table->dateTime('logintime')->comment('登录时间');
             $table->string('ip', 64)->default('');
+            $table->index('admin_id', 'admin_id');
         });
     }
 
