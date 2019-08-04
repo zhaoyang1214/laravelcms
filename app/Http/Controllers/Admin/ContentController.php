@@ -603,7 +603,7 @@ class ContentController extends Controller
                         DB::rollBack();
                         return response()->json([
                             'status' => 10001,
-                            'message' => '修改失败'
+                            'message' => $expandData->getMessages()[0]['message'] ?? '修改失败'
                         ]);
                     }
                 }

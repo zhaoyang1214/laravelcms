@@ -125,7 +125,7 @@
 				</td>
 				<td><center>{{ $data->id }}</center></td>
 				<td>
-					<span>{{ $data->title }}</span>
+					<span><a href="//{{ config('system.siteurl') }}/content/{{ $data->id }}">{{ $data->title }}</a></span>
 					@if (!empty($data->position))
 						@foreach (explode(',', $data->position) as $value)
 						<font color="red">[{{ $positionList[$value]['name'] }}]</font>

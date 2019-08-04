@@ -7,6 +7,7 @@
 		<li>性能设置</li>
 		<li>模板设置</li>
 		<li>上传设置</li>
+		<li>安全设置</li>
 	</ul>
 	<div class="layui-tab-content">
 		<div class="layui-tab-item layui-show">
@@ -164,28 +165,28 @@
 					<div class="layui-input-inline input-xlarge">
 						<input type="text" name="index_tpl" value="{{ config('system.index_tpl') }}" autocomplete="off" placeholder="请输入首页模板" class="layui-input autosave">
 					</div>
-					<div class="layui-form-mid layui-word-aux">定义首页访问的模板，默认为index/index</div>
+					<div class="layui-form-mid layui-word-aux">定义首页访问的模板，默认为index.index</div>
 				</div>
 				<div class="layui-form-item">
 					<label class="layui-form-label form-label-large">搜索模板</label>
 					<div class="layui-input-inline input-xlarge">
 						<input type="text" name="search_tpl" value="{{ config('system.search_tpl') }}" autocomplete="off" placeholder="请输入搜索模板" class="layui-input autosave">
 					</div>
-					<div class="layui-form-mid layui-word-aux">定义网站搜索的模板，默认为search/index</div>
+					<div class="layui-form-mid layui-word-aux">定义网站搜索的模板，默认为search.index</div>
 				</div>
 				<div class="layui-form-item">
 					<label class="layui-form-label form-label-large">TAG主页模板</label>
 					<div class="layui-input-inline input-xlarge">
 						<input type="text" name="tags_index_tpl" value="{{ config('system.tags_index_tpl') }}" autocomplete="off" placeholder="请输入TAG主页模板" class="layui-input autosave">
 					</div>
-					<div class="layui-form-mid layui-word-aux">定义网站TAG集合页的模板，默认为tags/index</div>
+					<div class="layui-form-mid layui-word-aux">定义网站TAG集合页的模板，默认为tags.index</div>
 				</div>
 				<div class="layui-form-item">
 					<label class="layui-form-label form-label-large">TAG详情页模板</label>
 					<div class="layui-input-inline input-xlarge">
 						<input type="text" name="tags_info_tpl" value="{{ config('system.tags_info_tpl') }}" autocomplete="off" placeholder="请输入TAG详情页模板" class="layui-input autosave">
 					</div>
-					<div class="layui-form-mid layui-word-aux">定义TAG详情页模板，默认为tags/info</div>
+					<div class="layui-form-mid layui-word-aux">定义TAG详情页模板，默认为tags.info</div>
 				</div>
 				<div class="layui-form-item">
 					<label class="layui-form-label form-label-large">搜索结果分页数</label>
@@ -321,6 +322,17 @@
     					</div>
 					</div>
 					<div class="layui-form-mid layui-word-aux"></div>
+				</div>
+			</form>
+		</div>
+		<div class="layui-tab-item">
+			<form class="layui-form">
+				<div class="layui-form-item">
+					<label class="layui-form-label form-label-large">内容预览</label>
+					<div class="layui-input-inline input-xlarge">
+						<input type="checkbox" name="content_preview" value="1" lay-skin="switch" lay-text="ON|OFF" @if(config('system.content_preview')) checked @endif class="autosave">
+					</div>
+					<div class="layui-form-mid layui-word-aux">开启后预览未审核的内容</div>
 				</div>
 			</form>
 		</div>

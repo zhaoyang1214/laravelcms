@@ -36,11 +36,11 @@
               <dd><a href="javascript:cleanCache('1');">清除运行缓存</a></dd>
               <dd><a href="javascript:cleanCache('2');">清除配置缓存</a></dd>
               <dd><a href="javascript:cleanCache('3');">清除路由缓存</a></dd>
-              <dd><a href="javascript:cleanCache('4');">清除视图模板缓存</a></dd>
+              <dd><a href="javascript:cleanCache('4');">清除模板编译缓存</a></dd>
               <dd><a href="javascript:cleanCache('5');">清除compiled</a></dd>
             </dl>
           </li>
-          <li class="layui-nav-item to-index"><a href="/" target="_blank">前台首页</a></li>
+          <li class="layui-nav-item to-index"><a href="//{{ config('system.siteurl') }}" target="_blank">前台首页</a></li>
         </ul>
         
     </div>

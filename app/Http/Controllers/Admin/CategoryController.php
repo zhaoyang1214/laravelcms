@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
 
-    public function index(Request $request)
+    public function index()
     {
         $datas = (new Category())->getAllowList();
         $categoryModelList = CategoryModel::all()->toArray();

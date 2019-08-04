@@ -44,7 +44,7 @@
 <body>
 <div id="box">
     <img src="{{ asset('images/404.png') }}" alt="404">
-    <p>将在 <span id="mes">5</span> 秒钟后返回上一页，返回网站首页请点击 <a href="/">首页</a></p>
+    <p>将在 <span id="mes">5</span> 秒钟后返回上一页，返回网站首页请点击 <a href="@if(config('system.siteurl'))//{{ config('system.siteurl') }}@else / @endif">首页</a></p>
     <p class="hint">非常抱歉 - 您可能输入了错误的网址，或者该网页已删除或移动</p>
 </div>
 </body>

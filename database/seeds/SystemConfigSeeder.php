@@ -115,22 +115,22 @@ class SystemConfigSeeder extends Seeder
             ],
             [
                 'name' => 'index_tpl',
-                'value' => 'index/index',
+                'value' => 'index.index',
                 'create_time' => date('Y-m-d H:i:s')
             ],
             [
                 'name' => 'search_tpl',
-                'value' => 'search/index',
+                'value' => 'search.index',
                 'create_time' => date('Y-m-d H:i:s')
             ],
             [
                 'name' => 'tags_index_tpl',
-                'value' => 'tags/index',
+                'value' => 'tags.index',
                 'create_time' => date('Y-m-d H:i:s')
             ],
             [
                 'name' => 'tags_info_tpl',
-                'value' => 'tags/info',
+                'value' => 'tags.info',
                 'create_time' => date('Y-m-d H:i:s')
             ],
             [
@@ -211,6 +211,11 @@ class SystemConfigSeeder extends Seeder
             [
                 'name' => 'watermark_image',
                 'value' => '',
+                'create_time' => date('Y-m-d H:i:s')
+            ],
+            [
+                'name' => 'content_preview',
+                'value' => '0',
                 'create_time' => date('Y-m-d H:i:s')
             ]
         ]);

@@ -10,8 +10,10 @@
  * | contains the "web" middleware group. Now create something great!
  * |
  */
-Route::get('/', function () {
-    echo 'welcome';
+Route::group([
+    'namespace' => 'Home'
+], function () {
+    Route::get('/', 'IndexController@index');
 });
 
 Route::group([
