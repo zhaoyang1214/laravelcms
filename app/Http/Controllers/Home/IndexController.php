@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\HomeController;
+use App\Models\BaseModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
@@ -25,7 +26,8 @@ class IndexController extends HomeController
             return view('errors.404');
         }
         $common = $this->media();
-        $html = view($view, compact('common'))->render();
+        $model = new BaseModel();
+        $html = view($view, compact('common', 'model'))->render();
         if ($systemConfig['view_cache']) {
             Cache::set($viewCacheKey, $html, intval($systemConfig['html_index_cache_time']) / 60);
         }

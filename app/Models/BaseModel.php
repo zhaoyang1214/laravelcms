@@ -14,6 +14,20 @@ use Illuminate\Support\Facades\Cache;
  */
 class BaseModel extends Model
 {
+    /**
+     * @var string 表名
+     */
+    protected $table;
+
+    protected static $tableName = null;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        if (!is_null(self::$tableName)) {
+            $this->table = self::$tableName;
+        }
+    }
 
     /**
      * 错误信息
@@ -172,5 +186,63 @@ class BaseModel extends Model
         $list = $query->get($columns);
         Cache::set($key, $list, $ttl);
         return $list;
+    }
+
+    /**
+     * 功    能：设置表名并返回模型对象
+     * 修改日期：2019/8/7
+     *
+     * @param string $table 表名
+     * @return $this
+     */
+    public function table(string $table)
+    {
+        self::$tableName = $table;
+        return $this;
+    }
+
+    /**
+     * 功    能：返回模型
+     * 修改日期：2019/8/7
+     *
+     * @param string $modelName
+     * @return bool
+     */
+    public function getModel(string $modelName)
+    {
+        self::$tableName = null;
+        $class = 'App\\Models\\' . ucfirst($modelName);
+        if (class_exists($class)) {
+            return new $class();
+        }
+        return false;
+    }
+
+    /**
+     * 功    能：查询单条记录（带缓存）
+     * 修改日期：2019/8/7
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $instance Builder
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
+     */
+    public function cacheOne(\Illuminate\Database\Eloquent\Builder $instance)
+    {
+        $cacheSwitch = config('system.db_cache');
+        $cacheKey = md5($instance->toSql() . serialize($instance->getBindings()));
+        if ($cacheSwitch) {
+            $result = Cache::get($cacheKey);
+            if (!is_null($result)) {
+                return unserialize($result);
+            }
+        }
+        $result = $instance->first();
+        if ($cacheSwitch) {
+            try {
+                Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
+            } catch (\Psr\SimpleCache\InvalidArgumentException $e) {
+                return $this->appendMessage($e->getMessage());
+            }
+        }
+        return $result;
     }
 }
