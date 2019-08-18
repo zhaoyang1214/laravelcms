@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\View;
 
 class IndexController extends HomeController
 {
-
     public function index(Request $request)
     {
         $url = $request->getUri();
@@ -22,9 +21,6 @@ class IndexController extends HomeController
             }
         }
         $view = "home.{$systemConfig['theme']}.{$systemConfig['index_tpl']}";
-        if (!View::exists($view)) {
-            return view('errors.404');
-        }
         $common = $this->media();
         $model = new BaseModel();
         $html = view($view, compact('common', 'model'))->render();

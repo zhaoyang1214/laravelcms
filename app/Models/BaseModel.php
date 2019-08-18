@@ -1,8 +1,10 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * App\Models\BaseModel
@@ -75,107 +77,162 @@ class BaseModel extends Model
     /**
      * 获取单条记录，允许缓存
      *
-     * @param string|array|\Closure $column            
-     * @param mixed $operator            
-     * @param mixed $value            
-     * @param string $boolean            
-     * @param bool $cache            
-     * @param null|int|\DateInterval $ttl            
-     * @param array $columns            
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @param string|array|\Closure|int $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param bool $cache
+     * @param null|int|\DateInterval $ttl
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
      */
-    public static function getInfo($column, $operator = null, $value = null, string $boolean = 'and', bool $cache = true, $ttl = 7200, array $columns = ['*'])
-    {
+    public static function getInfo(
+        $column,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        bool $cache = true,
+        $ttl = 7200,
+        array $columns = ['*']
+    ) {
+        if (is_numeric($column)) {
+            $operator = $column;
+            $column = 'id';
+        }
+        $instance = static::query()->where($column, $operator, $value, $boolean);
         if ($cache) {
-            $key = self::createCacheKey([
-                (new static())->getTable(),
-                static::class,
-                __FUNCTION__,
-                $column,
-                $operator,
-                $value,
-                $boolean,
-                $columns
-            ]);
+            $key = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
             if (Cache::has($key)) {
                 return Cache::get($key);
             }
         }
-        $info = static::query()->where($column, $operator, $value, $boolean)->first($columns);
-        Cache::set($key, $info, $ttl);
-        return $info;
+        $result = $instance->first($columns);
+        if ($cache) {
+            Cache::set($key, $result, $ttl);
+        }
+        return $result;
+    }
+
+    /**
+     * 获取简单的单条记录，根据系统设置缓存
+     *
+     * @param string|array|\Closure|int $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public static function getInfoCache(
+        $column,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        array $columns = ['*']
+    ) {
+        $cacheSwitch = (bool)config('system.db_cache');
+        $ttl = intval(config('system.db_cache_time')) / 60;
+        return self::getInfo($column, $operator, $value, $boolean, $cacheSwitch, $ttl, $columns);
     }
 
     /**
      * 获取记录数
      *
-     * @param string|array|\Closure $column            
-     * @param mixed $operator            
-     * @param mixed $value            
-     * @param string $boolean            
-     * @param bool $cache            
-     * @param null|int|\DateInterval $ttl            
+     * @param string|array|\Closure $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param bool $cache
+     * @param null|int|\DateInterval $ttl
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return int
      */
-    public static function getCount($column, $operator = null, $value = null, string $boolean = 'and', bool $cache = true, $ttl = 7200)
-    {
+    public static function getCount(
+        $column = null,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        bool $cache = true,
+        $ttl = 7200,
+        array $columns = ['*']
+    ) {
+        $instance = static::query();
+        if (!is_null($column)) {
+            $instance = $instance->where($column, $operator, $value, $boolean);
+        }
         if ($cache) {
-            $key = self::createCacheKey([
-                (new static())->getTable(),
-                static::class,
-                __FUNCTION__,
-                $column,
-                $operator,
-                $value,
-                $boolean
-            ]);
+            $key = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns, 'count']);
             if (Cache::has($key)) {
                 return Cache::get($key);
             }
         }
-        $count = static::query()->where($column, $operator, $value, $boolean)->count();
-        Cache::set($key, $count, $ttl);
-        return $count;
+        $result = $instance->count($columns);
+        if ($cache) {
+            Cache::set($key, $result, $ttl);
+        }
+        return $result;
+    }
+
+    /**
+     * 获取简单的记录数，根据系统设置缓存
+     *
+     * @param string|array|\Closure|null $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return int
+     */
+    public static function getCountCache(
+        $column = null,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        array $columns = ['*']
+    ) {
+        $cacheSwitch = (bool)config('system.db_cache');
+        $ttl = intval(config('system.db_cache_time')) / 60;
+        return self::getCount($column, $operator, $value, $boolean, $cacheSwitch, $ttl, $columns);
     }
 
     /**
      * 获取多条记录数
      *
-     * @param string|array|\Closure $column            
-     * @param mixed $operator            
-     * @param mixed $value            
-     * @param string $boolean            
-     * @param int $limit            
-     * @param int $offset            
-     * @param bool $cache            
-     * @param null|int|\DateInterval $ttl            
-     * @param array $columns            
+     * @param string|array|\Closure|null $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param int $limit
+     * @param int $offset
+     * @param string|null $orderBy
+     * @param bool $cache
+     * @param null|int|\DateInterval $ttl
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public static function getList($column, $operator = null, $value = null, string $boolean = 'and', int $limit = null, int $offset = null, string $orderByColumn = null, string $orderBydirection = 'ASC', bool $cache = true, $ttl = 7200, array $columns = ['*'])
-    {
-        if ($cache) {
-            $key = self::createCacheKey([
-                (new static())->getTable(),
-                static::class,
-                __FUNCTION__,
-                $column,
-                $operator,
-                $value,
-                $boolean,
-                $limit,
-                $offset,
-                $orderByColumn,
-                $orderBydirection,
-                $columns
-            ]);
-            if (Cache::has($key)) {
-                return Cache::get($key);
-            }
+    public static function getList(
+        $column = null,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        int $limit = null,
+        int $offset = null,
+        string $orderBy = null,
+        bool $cache = true,
+        $ttl = 7200,
+        array $columns = ['*']
+    ) {
+        $query = static::query();
+        if (!is_null($column)) {
+            $query = $query->where($column, $operator, $value, $boolean);
         }
-        $query = static::query()->where($column, $operator, $value, $boolean);
-        if (isset($orderByColumn)) {
-            $query = $query->orderBy($orderByColumn, $orderBydirection);
+        if (isset($orderBy)) {
+            $query = $query->orderByRaw($orderBy);
         }
         if (isset($limit)) {
             $query = $query->limit($limit);
@@ -183,9 +240,57 @@ class BaseModel extends Model
         if (isset($offset)) {
             $query = $query->offset($offset);
         }
+        if ($cache) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $columns, 'list']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
         $list = $query->get($columns);
-        Cache::set($key, $list, $ttl);
+        if ($cache) {
+            Cache::set($key, $list, $ttl);
+        }
         return $list;
+    }
+
+    /**
+     * 获取多条记录数，根据系统设置缓存
+     *
+     * @param string|array|\Closure|null $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param int $limit
+     * @param int $offset
+     * @param string|null $orderBy
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function getListCache(
+        $column = null,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        int $limit = null,
+        int $offset = null,
+        string $orderBy = null,
+        array $columns = ['*']
+    ) {
+        $cacheSwitch = (bool)config('system.db_cache');
+        $ttl = intval(config('system.db_cache_time')) / 60;
+        return self::getList(
+            $column,
+            $operator,
+            $value,
+            $boolean,
+            $limit,
+            $offset,
+            $orderBy,
+            $cacheSwitch,
+            $ttl,
+            $columns
+        );
     }
 
     /**
@@ -223,23 +328,79 @@ class BaseModel extends Model
      * 修改日期：2019/8/7
      *
      * @param \Illuminate\Database\Eloquent\Builder $instance Builder
+     * @param array $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
      */
-    public function cacheOne(\Illuminate\Database\Eloquent\Builder $instance)
+    public function cacheOne(Builder $instance, array $columns = ['*'])
     {
         $cacheSwitch = config('system.db_cache');
-        $cacheKey = md5($instance->toSql() . serialize($instance->getBindings()));
+        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
         if ($cacheSwitch) {
-            $result = Cache::get($cacheKey);
-            if (!is_null($result)) {
-                return unserialize($result);
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
             }
         }
-        $result = $instance->first();
+        $result = $instance->first($columns);
         if ($cacheSwitch) {
             try {
                 Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
-            } catch (\Psr\SimpleCache\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
+                return $this->appendMessage($e->getMessage());
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 功能：查询总记录数
+     * 修改日期：2019/8/15
+     *
+     * @param Builder $instance
+     * @param string $columns
+     * @return bool|int
+     */
+    public function cacheCount(Builder $instance, $columns = '*')
+    {
+        $cacheSwitch = config('system.db_cache');
+        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
+        if ($cacheSwitch) {
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+        }
+        $result = $instance->count($columns);
+        if ($cacheSwitch) {
+            try {
+                Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
+            } catch (InvalidArgumentException $e) {
+                return $this->appendMessage($e->getMessage());
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 功能：获取多条记录
+     * 修改日期：2019/8/15
+     *
+     * @param Builder $instance
+     * @param array $columns
+     * @return bool|Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
+     */
+    public function cacheGet(Builder $instance, array $columns = ['*'])
+    {
+        $cacheSwitch = config('system.db_cache');
+        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
+        if ($cacheSwitch) {
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+        }
+        $result = $instance->get($columns);
+        if ($cacheSwitch) {
+            try {
+                Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
+            } catch (InvalidArgumentException $e) {
                 return $this->appendMessage($e->getMessage());
             }
         }

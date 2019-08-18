@@ -12,7 +12,7 @@
 		<div class="layui-tab-item layui-show">
 				<div class="layui-form-item">
         			<label for="pid" class="layui-form-label form-label-medium">栏目</label>
-        			<div class="layui-input-inline input-xlarge">
+        			<div class="layui-input-inline input-xlarge" style="z-index: 1000;">
         				<select name="category_id" id="category_id" lay-filter="category_id" style="width: 300px">
         					<option value="0">=====选择栏目=====</option>
         					@foreach($categoryList as $value)

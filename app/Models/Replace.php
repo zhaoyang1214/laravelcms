@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
+
 /**
  * App\Models\Replace
  *
@@ -39,4 +41,33 @@ class Replace extends BaseModel
         'num',
         'status'
     ];
+
+    /**
+     * 功能：替换内容
+     * 修改日期：2019/8/18
+     *
+     * @param string $content
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return mixed|string
+     */
+    public function replaceContent(string $content)
+    {
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([__class__, __method__, $content]);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = self::getListCache('status', 1);
+        foreach ($list as $replace) {
+            $count = $replace->num > 0 ? $replace->num : null;
+            $content = preg_replace("/{$replace->key}/", $replace->content, $content, $count);
+        }
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $content;
+    }
 }

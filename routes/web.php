@@ -14,6 +14,7 @@ Route::group([
     'namespace' => 'Home'
 ], function () {
     Route::get('/', 'IndexController@index');
+    Route::get('/category/{urlname}', 'CategoryController@index')->where('urlname', '[a-z0-9]*');
 });
 
 Route::group([

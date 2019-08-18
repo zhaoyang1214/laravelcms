@@ -5,7 +5,7 @@
 	<form class="layui-form">
 		<div class="layui-form-item">
 			<label for="pid" class="layui-form-label form-label-medium">上级栏目</label>
-			<div class="layui-input-inline">
+			<div class="layui-input-inline" style="z-index: 1000;">
 				<select name="pid" id="pid" lay-filter="pid" style="width: 300px">
 					<option value="0">=====顶级栏目=====</option>
 					@foreach($categoryList as $value)

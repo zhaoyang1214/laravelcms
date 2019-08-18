@@ -26,11 +26,7 @@ class Category
         // 子栏目集合名
         $this->field['child'] = $field['child'] ?? 'child';
         $this->pad = $pad;
-        $this->icon = $icon ?? [
-            '│',
-            '├',
-            '└'
-        ];
+        $this->icon = $icon ?? ['│', '├', '└'];
     }
 
     public function setMaxDepth($maxDepth)
@@ -75,13 +71,9 @@ class Category
 
     /**
      * 栏目归类
-     * 
-     * @param mixed $id
-     *            父类id
-     * @param int $depth
-     *            当前节点深度
-     * @author : ZhaoYang
-     *         @date: 2018年10月1日 下午10:19:55
+     * @param mixed $id 父类id
+     * @param int $depth 当前节点深度
+     * @return array
      */
     public function categoryGroup($id, $depth = 1)
     {
@@ -110,29 +102,31 @@ class Category
 
     public function getParents($id, $depth = 1)
     {
-        static $category = [];
+        $category = [];
         $nowCategory = $this->getCategoryById($id);
         if (empty($nowCategory)) {
             return $category;
         }
         $category[] = $nowCategory;
         if (is_null($this->maxDepth) || $this->maxDepth > $depth) {
-            $this->getParents($nowCategory[$this->field['pid']], $depth);
+            $parents = $this->getParents($nowCategory[$this->field['pid']], $depth);
+            $category = array_merge($category, $parents);
         }
         return $category;
     }
 
     public function getSons($id, $depth = 1)
     {
-        static $category = [];
+        $category = [];
         $childCategory = $this->getChildCategory($id);
         if (empty($childCategory)) {
             return $category;
         }
-        if (is_null($this->maxDepth) || $this->maxDepth > $depth) {
+        if (is_null($this->maxDepth) || $this->maxDepth >= $depth) {
             foreach ($childCategory as $k => $v) {
                 $category[] = $v;
-                $this->getSons($v[$this->field['id']], $depth + 1);
+                $sons = $this->getSons($v[$this->field['id']], $depth + 1);
+                $category = array_merge($category, $sons);
             }
         }
         return $category;

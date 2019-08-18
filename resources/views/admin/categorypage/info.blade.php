@@ -5,8 +5,8 @@
 	<form class="layui-form">
 		<div class="layui-form-item">
 			<label for="pid" class="layui-form-label form-label-medium">上级栏目</label>
-			<div class="layui-input-inline">
-				<select name="pid" id="pid" lay-filter="pid" style="width: 300px">
+			<div class="layui-input-inline" style="z-index: 1000;">
+				<select name="pid" id="pid" lay-filter="pid" style="width: 300px;">
 					<option value="0">=====顶级栏目=====</option>
 					@foreach($categoryList as $value)
 					<option value="{{ $value['id'] }}" @if(isset($info) && $info['pid']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>

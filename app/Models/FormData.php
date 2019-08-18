@@ -144,4 +144,10 @@ class FormData extends BaseModel
         }
         return $res;
     }
+
+    public function setTableName($tableName)
+    {
+        self::$_table = $tableName;
+        return $this;
+    }
 }
