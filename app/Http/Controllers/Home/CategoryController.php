@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\View;
 
 class CategoryController extends HomeController
 {
@@ -59,9 +58,9 @@ class CategoryController extends HomeController
             $parentCategory = Category::getInfoCache($category->pid);
             $common = $this->media($category->name, $category->keywords, $category->description);
             $topCategory = $category->getTopCategory($category->id);
-            $renderView = empty($category->category_tpl) ? 'categorypage/index' : $category->category_tpl;
+            $renderView = empty($category->category_tpl) ? 'category.page' : $category->category_tpl;
             $model = new BaseModel();
-            $html = View($renderView, compact(
+            $html = View("home.{$systemConfig['theme']}.{$renderView}", compact(
                 'nav',
                 'common',
                 'model',
@@ -71,13 +70,21 @@ class CategoryController extends HomeController
                 'parentCategory',
                 'topCategory'
             ))->render();
-        } elseif ($category->category_model_id == 3) {
+        } elseif ($category->category_model_id == 1) {
+            if ($category->type == 1) {
+                $categorySons = $category->getSons($category->id);
+                $categoryIds = array_column($categorySons, 'id');
+                $categoryIds[] = $category->id;
+                $categoryIds = implode(',', $categoryIds);
+            } else {
+                $categoryIds = $category->id;
+            }
             $html = '';
         } else {
             return view('errors.404');
         }
         if ($systemConfig['view_cache']) {
-            Cache::set($this->viewCacheKey, $html, intval($systemConfig['html_index_cache_time']) / 60);
+            Cache::set($viewCacheKey, $html, intval($systemConfig['html_index_cache_time']) / 60);
         }
         return $html;
     }

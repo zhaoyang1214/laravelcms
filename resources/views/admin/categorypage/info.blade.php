@@ -115,7 +115,7 @@
 		<div class="layui-form-item">
 			<label for="category_tpl" class="layui-form-label form-label-medium">单页面模板</label>
 			<div class="layui-input-inline input-large">
-				<input type="text" id="category_tpl" name="category_tpl" value="@isset($info){{ $info->category_tpl }}@else{{ 'categorypage/index' }}@endisset" autocomplete="off" class="layui-input">
+				<input type="text" id="category_tpl" name="category_tpl" value="@isset($info){{ $info->category_tpl }}@else{{ 'category.page' }}@endisset" autocomplete="off" class="layui-input">
 			</div>
 			<div class="layui-form-mid layui-word-aux">用于单页面的显示</div>
 		</div>
