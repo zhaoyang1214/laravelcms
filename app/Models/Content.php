@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
 use Overtrue\Pinyin\Pinyin;
 
 /**
@@ -134,5 +135,70 @@ class Content extends BaseModel
         $info->update_time = $data['update_time'];
         $res = $info->fill($data)->save();
         return $res === false ? false : $info;
+    }
+
+    /**
+     * 功能：获取内容列表
+     * 修改日期：2019/8/21
+     *
+     * @param array $categoryIds
+     * @param int $listRows
+     * @param int $expandId
+     * @param int $order
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     */
+    public function getContentList(array $categoryIds, int $listRows, int $expandId = 0, int $order = 1)
+    {
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')->leftJoin('category as b', 'a.category_id', 'b.id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        if ($expandId) {
+            $expand = Expand::getInfoCache($expandId);
+            $expandDataTable = (new ExpandData($expand->table))->getTable();
+            $expandFieldList = ExpandField::getListCache('expand_id', $expandId)->toArray();
+            $expandFields = array_column($expandFieldList, 'field');
+            foreach ($expandFields as $expandField) {
+                $columns[] = 'c.' . $expandField;
+            }
+            $query->leftJoin("{$expandDataTable} as c", 'c.content_id', 'a.id');
+        }
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->whereIn('a.category_id', $categoryIds)
+            ->where('a.status', 1);
+        switch ($order) {
+            case 2:
+                $query = $query->orderBy('a.update_time');
+                break;
+            case 3:
+                $query = $query->orderByDesc('a.id');
+                break;
+            case 4:
+                break;
+            case 5:
+                $query = $query->orderByDesc('a.sequence');
+                break;
+            case 6:
+                $query = $query->orderBy('a.sequence');
+                break;
+            case 1:
+            default:
+                $query = $query->orderByDesc('a.update_time');
+        }
+        $query = $query->orderBy('a.id');
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getContentList']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
     }
 }

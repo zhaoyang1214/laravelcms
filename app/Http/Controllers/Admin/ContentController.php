@@ -201,15 +201,11 @@ class ContentController extends Controller
                 $query = $query->orderBy('content.update_time');
                 break;
             case 3:
+            case 5:
                 $query = $query->orderByDesc('content.id');
                 break;
             case 4:
-                break;
-            case 5:
-                $query = $query->orderByDesc('content.input_time');
-                break;
             case 6:
-                $query = $query->orderBy('content.input_time');
                 break;
             case 7:
                 $query = $query->orderByDesc('content.views');

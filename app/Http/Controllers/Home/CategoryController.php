@@ -6,6 +6,7 @@ use App\Models\BaseModel;
 use App\Models\Category;
 use App\Models\CategoryJump;
 use App\Models\CategoryPage;
+use App\Models\Content;
 use App\Models\Replace;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -75,10 +76,16 @@ class CategoryController extends HomeController
                 $categorySons = $category->getSons($category->id);
                 $categoryIds = array_column($categorySons, 'id');
                 $categoryIds[] = $category->id;
-                $categoryIds = implode(',', $categoryIds);
             } else {
-                $categoryIds = $category->id;
+                $categoryIds = [$category->id];
             }
+            $listRows = intval($category->page);
+            $listRows = $listRows > 0 ? $listRows : 10;
+            $content = new Content();
+            $list = $content->getContentList($categoryIds, $listRows, $category->expand_id, $category->content_order);
+            echo "<pre>";
+            var_dump($list);
+            exit;
             $html = '';
         } else {
             return view('errors.404');
