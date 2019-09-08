@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\CategoryJump;
 use App\Models\CategoryPage;
 use App\Models\Content;
+use App\Models\ExpandField;
 use App\Models\Replace;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,6 +17,15 @@ use Illuminate\Support\Facades\Cache;
 class CategoryController extends HomeController
 {
 
+    /**
+     * 功能：栏目
+     * 修改日期：2019/8/22
+     *
+     * @param Request $request
+     * @param $urlname
+     * @throws \Psr\SimpleCache\InvalidArgumentException|\Throwable
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View|mixed|string
+     */
     public function index(Request $request, $urlname)
     {
         $url = $request->getUri();
@@ -56,7 +66,7 @@ class CategoryController extends HomeController
             $paginator->setPath($url);
             $content = $contents[0];
             $nav = $category->getParents($category->id);
-            $parentCategory = Category::getInfoCache($category->pid);
+            $parentCategory = $category->getParent($category->id);
             $common = $this->media($category->name, $category->keywords, $category->description);
             $topCategory = $category->getTopCategory($category->id);
             $renderView = empty($category->category_tpl) ? 'category.page' : $category->category_tpl;
@@ -83,10 +93,25 @@ class CategoryController extends HomeController
             $listRows = $listRows > 0 ? $listRows : 10;
             $content = new Content();
             $list = $content->getContentList($categoryIds, $listRows, $category->expand_id, $category->content_order);
-            echo "<pre>";
-            var_dump($list);
-            exit;
-            $html = '';
+            $nav = $category->getParents($category->id);
+            $common = $this->media($category->name, $category->keywords, $category->description);
+            $model = new BaseModel();
+            $topCategory = $category->getTopCategory($category->id);
+            $parentCategory = $category->getParent($category->id);
+            $expandField = new ExpandField();
+            $expandFieldList = ExpandField::getListCache('expand_id', $category->expand_id);
+            $renderView = empty($category->category_tpl) ? 'category.index' : $category->category_tpl;
+            $html = View("home.{$systemConfig['theme']}.{$renderView}", compact(
+                'nav',
+                'common',
+                'model',
+                'category',
+                'list',
+                'topCategory',
+                'parentCategory',
+                'expandField',
+                'expandFieldList'
+            ))->render();
         } else {
             return view('errors.404');
         }
