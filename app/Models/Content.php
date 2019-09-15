@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Overtrue\Pinyin\Pinyin;
 
@@ -169,24 +170,24 @@ class Content extends BaseModel
             ->where('a.status', 1);
         switch ($order) {
             case 2:
-                $query = $query->orderBy('a.update_time');
+                $query->orderBy('a.update_time')->orderBy('a.id');
                 break;
             case 3:
-                $query = $query->orderByDesc('a.id');
+                $query->orderByDesc('a.id');
                 break;
             case 4:
+                $query->orderBy('a.id');
                 break;
             case 5:
-                $query = $query->orderByDesc('a.sequence');
+                $query->orderByDesc('a.sequence')->orderBy('a.id');
                 break;
             case 6:
-                $query = $query->orderBy('a.sequence');
+                $query->orderBy('a.sequence')->orderBy('a.id');
                 break;
             case 1:
             default:
-                $query = $query->orderByDesc('a.update_time');
+                $query->orderByDesc('a.update_time')->orderBy('a.id');
         }
-        $query = $query->orderBy('a.id');
         $cacheSwitch = (bool)config('system.db_cache');
         if ($cacheSwitch) {
             $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getContentList']);
@@ -200,5 +201,232 @@ class Content extends BaseModel
             Cache::set($key, $list, $ttl);
         }
         return $list;
+    }
+
+    /**
+     * 获取单条记录，允许缓存
+     *
+     * @param string|array|\Closure|int $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
+     * @param array $columns
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
+     */
+    public static function getInfoCache(
+        $column,
+        $operator = null,
+        $value = null,
+        string $boolean = 'and',
+        array $columns = ['*']
+    ) {
+        if (is_numeric($column)) {
+            $operator = $column;
+            $column = 'id';
+        }
+        $instance = static::query()->where($column, $operator, $value, $boolean)->where('status', 1);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+        }
+        $result = $instance->first($columns);
+        if (!empty($result)) {
+            $result->url = '/content/' . $result->urltitle;
+        }
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($cacheKey, $result, $ttl);
+        }
+        return $result;
+    }
+
+    /**
+     * 功能：获取同栏目上一条内容
+     * 修改日期：2019/9/15
+     *
+     * @param $content
+     * @param $category
+     * @param int $isArray
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
+     */
+    public function getPrevContent($content, $category, int $isArray = 0)
+    {
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $cacheKey = self::createCacheKey([__METHOD__, $content, $category, $isArray]);
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+        }
+        if (is_object($content)) {
+            $content = $content->toArray();
+        }
+        if (is_object($category)) {
+            $category = $category->toArray();
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')->leftJoin('category as b', 'a.category_id', 'b.id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        if ($category['expand_id']) {
+            $expand = Expand::getInfoCache($category['expand_id']);
+            $expandDataTable = (new ExpandData($expand->table))->getTable();
+            $expandFieldList = ExpandField::getListCache('expand_id', $category['expand_id'])->toArray();
+            $expandFields = array_column($expandFieldList, 'field');
+            foreach ($expandFields as $expandField) {
+                $columns[] = 'c.' . $expandField;
+            }
+            $query->leftJoin("{$expandDataTable} as c", 'c.content_id', 'a.id');
+        }
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->where('a.category_id', $category['id'])
+            ->where('a.status', 1);
+        switch ($category['content_order']) {
+            case 2:
+                $operators = '<';
+                $field = 'update_time';
+                $query->orderByDesc('a.update_time')->orderBy('a.id');
+                break;
+            case 3:
+                $operators = '>';
+                $field = 'id';
+                $query->orderBy('a.id');
+                break;
+            case 4:
+                $operators = '<';
+                $field = 'id';
+                $query->orderByDesc('a.id');
+                break;
+            case 5:
+                $operators = '>';
+                $field = 'sequence';
+                $query->orderBy('a.sequence')->orderBy('a.id');
+                break;
+            case 6:
+                $operators = '<';
+                $field = 'sequence';
+                $query->orderByDesc('a.sequence')->orderBy('a.id');
+                break;
+            case 1:
+            default:
+                $operators = '>';
+                $field = 'update_time';
+                $query->orderBy('a.update_time')->orderBy('a.id');
+        }
+        $query->where(function (Builder $query) use ($content, $field, $operators) {
+            $query->where("a.{$field}", $operators, $content[$field])
+                ->orWhere("a.{$field}", $content[$field])
+                ->where('a.id', '<', $content['id']);
+        });
+        $result = $query->first();
+        if (!empty($result)) {
+            $result->url = '/content/' . $result->urltitle;
+            if ($isArray) {
+                $result = $result->toArray();
+            }
+        }
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($cacheKey, $result, $ttl);
+        }
+        return $result;
+    }
+
+    /**
+     * 功能：获取同栏目下一条内容
+     * 修改日期：2019/9/15
+     *
+     * @param $content
+     * @param $category
+     * @param int $isArray
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
+     */
+    public function getNextContent($content, $category, int $isArray = 0)
+    {
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $cacheKey = self::createCacheKey([__METHOD__, $content, $category, $isArray]);
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+        }
+        if (is_object($content)) {
+            $content = $content->toArray();
+        }
+        if (is_object($category)) {
+            $category = $category->toArray();
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')->leftJoin('category as b', 'a.category_id', 'b.id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        if ($category['expand_id']) {
+            $expand = Expand::getInfoCache($category['expand_id']);
+            $expandDataTable = (new ExpandData($expand->table))->getTable();
+            $expandFieldList = ExpandField::getListCache('expand_id', $category['expand_id'])->toArray();
+            $expandFields = array_column($expandFieldList, 'field');
+            foreach ($expandFields as $expandField) {
+                $columns[] = 'c.' . $expandField;
+            }
+            $query->leftJoin("{$expandDataTable} as c", 'c.content_id', 'a.id');
+        }
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->where('a.category_id', $category['id'])
+            ->where('a.status', 1);
+        switch ($category['content_order']) {
+            case 2:
+                $operators = '>';
+                $field = 'update_time';
+                $query->orderBy('a.update_time')->orderBy('a.id');
+                break;
+            case 3:
+                $operators = '<';
+                $field = 'id';
+                $query->orderByDesc('a.id');
+                break;
+            case 4:
+                $operators = '>';
+                $field = 'id';
+                $query->orderBy('a.id');
+                break;
+            case 5:
+                $operators = '<';
+                $field = 'sequence';
+                $query->orderByDesc('a.sequence')->orderBy('a.id');
+                break;
+            case 6:
+                $operators = '>';
+                $field = 'sequence';
+                $query->orderBy('a.sequence')->orderBy('a.id');
+                break;
+            case 1:
+            default:
+                $operators = '<';
+                $field = 'update_time';
+                $query->orderByDesc('a.update_time')->orderBy('a.id');
+        }
+        $query->where(function (Builder $query) use ($content, $field, $operators) {
+            $query->where("a.{$field}", $operators, $content[$field])
+                ->orWhere("a.{$field}", $content[$field])
+                ->where('a.id', '<', $content['id']);
+        });
+        $result = $query->first();
+        if (!empty($result)) {
+            $result->url = '/content/' . $result->urltitle;
+            if ($isArray) {
+                $result = $result->toArray();
+            }
+        }
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($cacheKey, $result, $ttl);
+        }
+        return $result;
     }
 }

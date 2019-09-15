@@ -125,7 +125,7 @@
 				</td>
 				<td><center>{{ $data->id }}</center></td>
 				<td>
-					<span><a href="//{{ config('system.siteurl') }}/content/{{ $data->id }}">{{ $data->title }}</a></span>
+					<span><a href="//{{ config('system.siteurl') }}/content/{{ $data->urltitle }}" target="_blank">{{ $data->title }}</a></span>
 					@if (!empty($data->position))
 						@foreach (explode(',', $data->position) as $value)
 						<font color="red">[{{ $positionList[$value]['name'] }}]</font>
@@ -135,7 +135,7 @@
 					<a class="layui-btn layui-btn-normal layui-btn-xs quickeditor" style=" display:none" onclick="x_admin_show('快速编辑','/admin/content/quickEdit/{{ $data->id }}', 850)">[快速编辑]</a>
 					@endif
 				</td>
-				<td><a href="#">{{ $data->category_name }}</a></td>
+				<td><a href="//">{{ $data->category_name }}</a></td>
 				<td><center>@if($data->status==1)<font color=green><b>√</b></font>@else<font color=red><b>×</b></font>@endif</center>
 				</td>
 				<td><center>{{ $data->update_time }}</center></td>

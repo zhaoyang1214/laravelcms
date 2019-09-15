@@ -15,6 +15,7 @@ Route::group([
 ], function () {
     Route::get('/', 'IndexController@index');
     Route::get('/category/{urlname}', 'CategoryController@index')->where('urlname', '[a-z0-9]*');
+    Route::get('/content/{urltitle}', 'ContentController@index')->where('urltitle', '[a-z0-9]*');
 });
 
 Route::group([

@@ -58,13 +58,13 @@ class CategoryController extends HomeController
             $collection = new Collection($contentArr);
             $perPage = 1;
             $contents = $collection->slice(($currentPage - 1) * $perPage, $perPage)->all();
-            $replace = new Replace();
-            foreach ($contents as &$content) {
+            $content = $contents[0];
+            if (!empty($content)) {
+                $replace = new Replace();
                 $content = $replace->replaceContent($content);
             }
             $paginator= new LengthAwarePaginator($contents, count($collection), $perPage, $currentPage);
             $paginator->setPath($url);
-            $content = $contents[0];
             $nav = $category->getParents($category->id);
             $parentCategory = $category->getParent($category->id);
             $common = $this->media($category->name, $category->keywords, $category->description);

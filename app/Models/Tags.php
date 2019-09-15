@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
+
 /**
  * App\Models\Tags
  *
@@ -35,4 +37,50 @@ class Tags extends BaseModel
         'name',
         'click'
     ];
+
+    public function getAllByCategoryContentId(int $contentId)
+    {
+        $query = static::from('content_tags as a')
+            ->leftJoin('tags as b', 'a.tags_id', 'b.id')
+            ->select(['b.id', 'b.tags_group_id', 'b.name', 'b.click'])
+            ->where('a.content_id', $contentId);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), 'getAllByCategoryContentId']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->get();
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
+    }
+
+    public function tagLink(string $content, int $contentId)
+    {
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$content, $contentId, __FUNCTION__]);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $this->getAllByCategoryContentId($contentId);
+        if (!empty($list)) {
+            $tags = array_column($list->toArray(), 'name');
+            $sorts = array_map(function ($value) {
+                return mb_strlen($value, 'UTF-8');
+            }, $tags);
+            array_multisort($sorts, SORT_DESC, SORT_NUMERIC, $tags);
+            $content = preg_replace('/(' . implode('|', $tags) . ')/', '<a href="/tags/$1">$1</a>', $content);
+        }
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $content, $ttl);
+        }
+        return $content;
+    }
 }
