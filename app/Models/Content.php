@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Overtrue\Pinyin\Pinyin;
 
@@ -139,17 +140,75 @@ class Content extends BaseModel
     }
 
     /**
+     * 功能：解析order参数
+     * 修改日期：2019/9/19
+     *
+     * @param int|string $order
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return array
+     */
+    private function parseOrder($order, Builder $query = null)
+    {
+        $orderArr = [];
+        if (is_numeric($order)) {
+            switch ($order) {
+                case 2:
+                    $orderArr[] = ['a.update_time'];
+                    break;
+                case 3:
+                    $orderArr[] = ['a.id', 'desc'];
+                    break;
+                case 4:
+                    $orderArr[] = ['a.id'];
+                    break;
+                case 5:
+                    $orderArr[] = ['a.sequence', 'desc'];
+                    break;
+                case 6:
+                    $orderArr[] = ['a.sequence'];
+                    break;
+                case 7:
+                    $orderArr[] = ['a.views', 'desc'];
+                    break;
+                case 8:
+                    $orderArr[] = ['a.views'];
+                    break;
+                case 1:
+                default:
+                    $orderArr[] = ['a.update_time', 'desc'];
+            }
+            $orderArr[] = ['a.id'];
+        } elseif (is_string($order)) {
+            $orders = preg_replace('/\s+/', ' ', $order);
+            $orders = explode(',', $orders);
+            foreach ($orders as $order) {
+                $arr = explode(' ', trim($order));
+                $orderArr[] = [
+                    $arr[0],
+                    $arr[1] ?? null
+                ];
+            }
+        }
+        if (!is_null($query)) {
+            foreach ($orderArr as $v) {
+                $query->orderBy(...$v);
+            }
+        }
+        return $orderArr;
+    }
+
+    /**
      * 功能：获取内容列表
      * 修改日期：2019/8/21
      *
      * @param array $categoryIds
      * @param int $listRows
      * @param int $expandId
-     * @param int $order
+     * @param int|string $order eg 1 or a.update_time desc
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public function getContentList(array $categoryIds, int $listRows, int $expandId = 0, int $order = 1)
+    public function getContentList(array $categoryIds, int $listRows, int $expandId = 0, $order = 1)
     {
         $dbPrefix = env('DB_PREFIX');
         $query = static::from('content as a')->leftJoin('category as b', 'a.category_id', 'b.id');
@@ -168,26 +227,7 @@ class Content extends BaseModel
             ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
             ->whereIn('a.category_id', $categoryIds)
             ->where('a.status', 1);
-        switch ($order) {
-            case 2:
-                $query->orderBy('a.update_time')->orderBy('a.id');
-                break;
-            case 3:
-                $query->orderByDesc('a.id');
-                break;
-            case 4:
-                $query->orderBy('a.id');
-                break;
-            case 5:
-                $query->orderByDesc('a.sequence')->orderBy('a.id');
-                break;
-            case 6:
-                $query->orderBy('a.sequence')->orderBy('a.id');
-                break;
-            case 1:
-            default:
-                $query->orderByDesc('a.update_time')->orderBy('a.id');
-        }
+        $this->parseOrder($order, $query);
         $cacheSwitch = (bool)config('system.db_cache');
         if ($cacheSwitch) {
             $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getContentList']);
@@ -248,8 +288,8 @@ class Content extends BaseModel
      * 功能：获取同栏目上一条内容
      * 修改日期：2019/9/15
      *
-     * @param $content
-     * @param $category
+     * @param array|\Illuminate\Database\Eloquent\Model $content
+     * @param array|\Illuminate\Database\Eloquent\Model $category
      * @param int $isArray
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
@@ -341,8 +381,8 @@ class Content extends BaseModel
      * 功能：获取同栏目下一条内容
      * 修改日期：2019/9/15
      *
-     * @param $content
-     * @param $category
+     * @param array|\Illuminate\Database\Eloquent\Model $content
+     * @param array|\Illuminate\Database\Eloquent\Model $category
      * @param int $isArray
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
@@ -428,5 +468,287 @@ class Content extends BaseModel
             Cache::set($cacheKey, $result, $ttl);
         }
         return $result;
+    }
+
+    /**
+     * 功能：根据栏目id获取内容
+     * 修改日期：2019/9/19
+     *
+     * @param int $categoryId
+     * @param int $listRows
+     * @param int|string $order eg 1 or a.update_time desc
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|LengthAwarePaginator|mixed
+     */
+    public function getListByCategoryId(int $categoryId, int $listRows = 10, $order = null)
+    {
+        $category = Category::getInfoCache($categoryId);
+        if (!$category) {
+            return new LengthAwarePaginator([], 0, 1);
+        }
+        $order = $order ?? intval($category->content_order);
+        return self::getContentList([$categoryId], $listRows, $category->expand_id, $order);
+    }
+
+    /**
+     * 功能：根据tags_id获取内容列表
+     * 修改日期：2019/9/22
+     *
+     * @param array|string $tagsIds
+     * @param int $listRows
+     * @param null|array|string $categoryIds
+     * @param bool $categorySon
+     * @param null|int|string $order
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     */
+    public function getListByTagsIds(
+        $tagsIds,
+        int $listRows = 10,
+        $categoryIds = null,
+        bool $categorySon = false,
+        $order = null
+    ) {
+        if (!is_array($tagsIds)) {
+            $tagsIds = explode(',', $tagsIds);
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')
+            ->leftJoin('category as b', 'a.category_id', 'b.id')
+            ->leftJoin('content_tags as c', 'a.id', 'c.content_id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->whereIn('c.tags_id', $tagsIds)
+            ->where('a.status', 1);
+        if (!is_null($categoryIds)) {
+            if (!is_array($categoryIds)) {
+                $categoryIds = explode(',', $categoryIds);
+            }
+            if ($categorySon) {
+                $categoryIdArr = $categoryIds;
+                $category = new Category();
+                foreach ($categoryIdArr as $categoryId) {
+                    $sons = $category->getSons(intval($categoryId));
+                    if (!empty($sons)) {
+                        $sonsIds = array_column($sons, 'id');
+                        $categoryIds = array_merge($categoryIds, $sonsIds);
+                    }
+                }
+            }
+            $query->whereIn('a.category_id', $categoryIds);
+        }
+        $order = $order ?? 'a.update_time DESC,a.views DESC,a.id ASC';
+        $this->parseOrder($order, $query);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getListByTagsIds']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
+    }
+
+    /**
+     * 功能：根据position_id获取内容列表
+     * 修改日期：2019/9/22
+     *
+     * @param array|string $positionIds
+     * @param int $listRows
+     * @param null|array|string $categoryIds
+     * @param bool $categorySon
+     * @param null|int|string $order
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     */
+    public function getListByPositions(
+        $positionIds,
+        int $listRows = 10,
+        $categoryIds = null,
+        bool $categorySon = false,
+        $order = null
+    ) {
+        if (!is_array($positionIds)) {
+            $positionIds = explode(',', $positionIds);
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')
+            ->leftJoin('category as b', 'a.category_id', 'b.id')
+            ->leftJoin('content_position as c', 'a.id', 'c.content_id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->whereIn('c.position_id', $positionIds)
+            ->where('a.status', 1);
+        if (!is_null($categoryIds)) {
+            if (!is_array($categoryIds)) {
+                $categoryIds = explode(',', $categoryIds);
+            }
+            if ($categorySon) {
+                $categoryIdArr = $categoryIds;
+                $category = new Category();
+                foreach ($categoryIdArr as $categoryId) {
+                    $sons = $category->getSons(intval($categoryId));
+                    if (!empty($sons)) {
+                        $sonsIds = array_column($sons, 'id');
+                        $categoryIds = array_merge($categoryIds, $sonsIds);
+                    }
+                }
+            }
+            $query->whereIn('a.category_id', $categoryIds);
+        }
+        $order = $order ?? 'a.update_time DESC,a.views DESC,a.id ASC';
+        $this->parseOrder($order, $query);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getListByTagsIds']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
+    }
+
+    /**
+     * 功能：根据position_id获取内容列表
+     * 修改日期：2019/9/22
+     *
+     * @param array|string $tagsGroupIds
+     * @param int $listRows
+     * @param null|array|string $categoryIds
+     * @param bool $categorySon
+     * @param null|int|string $order
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     */
+    public function getListByTagsGroupIds(
+        $tagsGroupIds,
+        int $listRows = 10,
+        $categoryIds = null,
+        bool $categorySon = false,
+        $order = null
+    ) {
+        if (!is_array($tagsGroupIds)) {
+            $tagsGroupIds = explode(',', $tagsGroupIds);
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')
+            ->leftJoin('category as b', 'a.category_id', 'b.id')
+            ->leftJoin('content_tags as c', 'a.id', 'c.content_id')
+            ->leftJoin('tags as d', 'c.tags_id', 'd.id');
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->whereIn('d.tags_group_id', $tagsGroupIds)
+            ->where('a.status', 1);
+        if (!is_null($categoryIds)) {
+            if (!is_array($categoryIds)) {
+                $categoryIds = explode(',', $categoryIds);
+            }
+            if ($categorySon) {
+                $categoryIdArr = $categoryIds;
+                $category = new Category();
+                foreach ($categoryIdArr as $categoryId) {
+                    $sons = $category->getSons(intval($categoryId));
+                    if (!empty($sons)) {
+                        $sonsIds = array_column($sons, 'id');
+                        $categoryIds = array_merge($categoryIds, $sonsIds);
+                    }
+                }
+            }
+            $query->whereIn('a.category_id', $categoryIds);
+        }
+        $order = $order ?? 'a.update_time DESC,a.views DESC,a.id ASC';
+        $this->parseOrder($order, $query);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getListByTagsIds']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
+    }
+
+    /**
+     * 功能：获取搜索结果
+     * 修改日期：2019/9/22
+     *
+     * @param string|array $keywords
+     * @param int $type
+     * @param array|null $categoryIds
+     * @param int $listRows
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     */
+    public function getListBySearch($keywords, int $type = 0, array $categoryIds = null, int $listRows = 10)
+    {
+        if (!is_array($keywords)) {
+            $keywords = explode(' ', $keywords);
+        }
+        $dbPrefix = env('DB_PREFIX');
+        $query = static::from('content as a')
+            ->leftJoin('category as b', 'a.category_id', 'b.id');
+        if ($type == 2) {
+            $query->leftJoin('content_data as c', 'a.id', 'c.content_id');
+        }
+        $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
+
+        $query->select($columns)
+            ->selectRaw("concat('/content/',{$dbPrefix}a.urltitle) as url")
+            ->where('a.status', 1);
+        if (!empty($categoryIds)) {
+            $query->whereIn('a.category_id', $categoryIds);
+        }
+        $query->where(function (Builder $query) use ($keywords, $type) {
+            foreach ($keywords as $value) {
+                switch ($type) {
+                    case 1: // 标题+描述+关键词
+                        $query->orWhere('a.title', 'like', "%{$value}%")
+                            ->orWhere('a.keywords', 'like', "%{$value}%")
+                            ->orWhere('a.description', 'like', "%{$value}%");
+                        break;
+                    case 2: // 标题+描述+关键词+全文
+                        $query->orWhere('a.title', 'like', "%{$value}%")
+                            ->orWhere('a.keywords', 'like', "%{$value}%")
+                            ->orWhere('a.description', 'like', "%{$value}%")
+                            ->orWhere('c.content', 'like', "%{$value}%");
+                        break;
+                    default: // 标题
+                        $query->orWhere('a.title', 'like', "%{$value}%");
+                        break;
+                }
+            }
+        });
+        $query->orderBy('a.update_time')->orderBy('a.id');
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getListBySearch']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
     }
 }

@@ -5,7 +5,6 @@ use App\Http\Controllers\HomeController;
 use App\Models\BaseModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\View;
 
 class IndexController extends HomeController
 {

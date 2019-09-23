@@ -39,6 +39,8 @@ class ContentController extends HomeController
      */
     public function index(Request $request, $urltitle)
     {
+        dump((new Content())->cacheGet(Content::where('id', 17)));
+        exit;
         $url = $request->getUri();
         $systemConfig =config('system');
         $viewCacheKey = 'view:' . $url;

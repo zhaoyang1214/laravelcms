@@ -14,8 +14,11 @@ Route::group([
     'namespace' => 'Home'
 ], function () {
     Route::get('/', 'IndexController@index');
-    Route::get('/category/{urlname}', 'CategoryController@index')->where('urlname', '[a-z0-9]*');
-    Route::get('/content/{urltitle}', 'ContentController@index')->where('urltitle', '[a-z0-9]*');
+    Route::get('/category/{urlname}', 'CategoryController@index');
+    Route::get('/content/{urltitle}', 'ContentController@index');
+    Route::get('/search', 'SearchController@index');
+    Route::get('/tags/index', 'TagsController@index');
+    Route::get('/tags/{tag}', 'TagsController@info');
 });
 
 Route::group([

@@ -116,7 +116,7 @@ class CategoryController extends HomeController
             return view('errors.404');
         }
         if ($systemConfig['view_cache']) {
-            Cache::set($viewCacheKey, $html, intval($systemConfig['html_index_cache_time']) / 60);
+            Cache::set($viewCacheKey, $html, intval($systemConfig['html_other_cache_time']) / 60);
         }
         return $html;
     }

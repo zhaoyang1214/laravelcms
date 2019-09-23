@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tagsgroup;
+use App\Models\TagsGroup;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 
@@ -11,7 +11,7 @@ class TagsgroupController extends Controller
 
     public function index()
     {
-        $datas = Tagsgroup::paginate(10);
+        $datas = TagsGroup::paginate(10);
         $admin = new Admin();
         $tagsIndexPower = $admin->checkPower('tags', 'index');
         $tagsgroupAddPower = $admin->checkPower('tagsgroup', 'add');

@@ -65,6 +65,7 @@
 			<tr>
 				<th width="20px"><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></th>
 				<th>序号</th>
+				<th>id</th>
 				<th>名称</th>
 				<th>分组</th>
 				<th>点击数</th>
@@ -77,6 +78,7 @@
 				<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{{ $data->id }}'><i class="layui-icon">&#xe605;</i></div>
 				</td>
 				<td>{{ $loop->iteration }}</td>
+				<td>{{ $data->id }}</td>
 				<td>{{ $data->name }}</td>
 				<td>{{ $data->tags_group_name }}</td>
 				<td>{{ $data->click }}</td>

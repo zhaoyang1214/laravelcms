@@ -15,7 +15,8 @@
 		<thead>
 			<tr>
 				<th width="10%">序号</th>
-				<th width="70%">名称</th>
+				<th width="10%">id</th>
+				<th width="60%">名称</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -23,6 +24,7 @@
 			@foreach ($datas as $data)
 			<tr>
 				<td>{{ $loop->iteration }}</td>
+				<td>{{ $data->id }}</td>
 				<td>{{ $data->name }}</td>
 				<td>
 					@if($tagsgroupInfoPower)

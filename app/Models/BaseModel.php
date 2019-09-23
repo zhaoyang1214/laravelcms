@@ -66,7 +66,7 @@ class BaseModel extends Model
     /**
      * 创建缓存Key
      *
-     * @param array $params            
+     * @param array $params
      * @return string
      */
     public static function createCacheKey(array $params)
@@ -324,31 +324,31 @@ class BaseModel extends Model
     }
 
     /**
+     * 功    能：cacheFirst别名
+     * 修改日期：2019/8/7
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $instance Builder
+     * @param array $columns
+     * @throws  \Exception
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
+     */
+    public function cacheOne(Builder $instance, array $columns = ['*'])
+    {
+        return $this->cacheFirst($instance, $columns);
+    }
+
+    /**
      * 功    能：查询单条记录（带缓存）
      * 修改日期：2019/8/7
      *
      * @param \Illuminate\Database\Eloquent\Builder $instance Builder
      * @param array $columns
+     * @throws  \Exception
      * @return \Illuminate\Database\Eloquent\Model|object|static|null|bool
      */
-    public function cacheOne(Builder $instance, array $columns = ['*'])
+    public function cacheFirst(Builder $instance, array $columns = ['*'])
     {
-        $cacheSwitch = config('system.db_cache');
-        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
-        if ($cacheSwitch) {
-            if (Cache::has($cacheKey)) {
-                return Cache::get($cacheKey);
-            }
-        }
-        $result = $instance->first($columns);
-        if ($cacheSwitch) {
-            try {
-                Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
-            } catch (InvalidArgumentException $e) {
-                return $this->appendMessage($e->getMessage());
-            }
-        }
-        return $result;
+        return $this->cacheQuery($instance, 'first', $columns);
     }
 
     /**
@@ -357,18 +357,51 @@ class BaseModel extends Model
      *
      * @param Builder $instance
      * @param string $columns
+     * @throws  \Exception
      * @return bool|int
      */
     public function cacheCount(Builder $instance, $columns = '*')
     {
+        return $this->cacheQuery($instance, 'count', $columns);
+    }
+
+    /**
+     * 功能：获取多条记录
+     * 修改日期：2019/8/15
+     *
+     * @param Builder $instance
+     * @param array $columns
+     * @throws  \Exception
+     * @return bool|Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
+     */
+    public function cacheGet(Builder $instance, array $columns = ['*'])
+    {
+        return $this->cacheQuery($instance, 'get', $columns);
+    }
+
+    /**
+     * 功能：缓存查询
+     * 修改日期：2019/9/22
+     *
+     * @param Builder $instance
+     * @param string $query
+     * @param mixed ...$params
+     * @throws  \Exception
+     * @return bool|mixed
+     */
+    public function cacheQuery(Builder $instance, string $query, ...$params)
+    {
         $cacheSwitch = config('system.db_cache');
-        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
+        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $query, $params]);
         if ($cacheSwitch) {
             if (Cache::has($cacheKey)) {
                 return Cache::get($cacheKey);
             }
         }
-        $result = $instance->count($columns);
+        if (!method_exists($instance, $query)) {
+            throw new \Exception('Class ' . get_class($instance) . " does not have method $query");
+        }
+        $result = $instance->{$query}(...$params);
         if ($cacheSwitch) {
             try {
                 Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
@@ -380,30 +413,19 @@ class BaseModel extends Model
     }
 
     /**
-     * 功能：获取多条记录
+     * 功能：获取分页
      * 修改日期：2019/8/15
      *
      * @param Builder $instance
-     * @param array $columns
+     * @param  int  $perPage
+     * @param  array  $columns
+     * @param  string  $pageName
+     * @param  int|null  $page
+     * @throws  \Exception
      * @return bool|Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function cacheGet(Builder $instance, array $columns = ['*'])
+    public function cachePaginate(Builder $instance, $perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $cacheSwitch = config('system.db_cache');
-        $cacheKey = self::createCacheKey([$instance->toSql(), $instance->getBindings(), $columns]);
-        if ($cacheSwitch) {
-            if (Cache::has($cacheKey)) {
-                return Cache::get($cacheKey);
-            }
-        }
-        $result = $instance->get($columns);
-        if ($cacheSwitch) {
-            try {
-                Cache::set($cacheKey, $result, intval(config('system.db_cache_time')) / 60);
-            } catch (InvalidArgumentException $e) {
-                return $this->appendMessage($e->getMessage());
-            }
-        }
-        return $result;
+        return $this->cacheQuery($instance, 'paginate', $perPage, $columns, $pageName, $page);
     }
 }
