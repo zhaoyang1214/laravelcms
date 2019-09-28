@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,13 +10,18 @@ use Illuminate\Filesystem\Filesystem;
 class UeditorController extends Controller
 {
 
+    protected $ueditorConfig;
+
     public function __construct()
     {
         $systemConfig = config('system');
         $fileSize = $systemConfig['file_size'] * 1024 * 1024;
-        $imageAllowFiles = empty($systemConfig['image_type']) ? [] : explode(',', str_replace(',', ',.', '.' . $systemConfig['image_type']));
-        $videoAllowFiles = empty($systemConfig['video_type']) ? [] : explode(',', str_replace(',', ',.', '.' . $systemConfig['video_type']));
-        $fileAllowFiles = empty($systemConfig['file_type']) ? [] : explode(',', str_replace(',', ',.', '.' . $systemConfig['file_type']));
+        $imageAllowFiles = empty($systemConfig['image_type']) ? []
+            : explode(',', str_replace(',', ',.', '.' . $systemConfig['image_type']));
+        $videoAllowFiles = empty($systemConfig['video_type']) ? []
+            : explode(',', str_replace(',', ',.', '.' . $systemConfig['video_type']));
+        $fileAllowFiles = empty($systemConfig['file_type']) ? []
+            : explode(',', str_replace(',', ',.', '.' . $systemConfig['file_type']));
         $dataPath = date('Y-m/d/');
         
         $this->ueditorConfig = [
@@ -94,8 +99,14 @@ class UeditorController extends Controller
 
     public function index(Request $request)
     {
+        $action = $request->get('action');
+        if ($action != 'config' && !config('system.upload_switch')) {
+            return response()->json([
+                'state' => '未开启上传文件功能'
+            ]);
+        }
         set_time_limit(3600);
-        switch ($request->get('action')) {
+        switch ($action) {
             case 'config':
                 $response = $this->ueditorConfig;
                 break;

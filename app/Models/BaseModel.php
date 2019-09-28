@@ -424,8 +424,13 @@ class BaseModel extends Model
      * @throws  \Exception
      * @return bool|Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function cachePaginate(Builder $instance, $perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-    {
+    public function cachePaginate(
+        Builder $instance,
+        int $perPage = null,
+        array $columns = ['*'],
+        string $pageName = 'page',
+        $page = null
+    ) {
         return $this->cacheQuery($instance, 'paginate', $perPage, $columns, $pageName, $page);
     }
 }

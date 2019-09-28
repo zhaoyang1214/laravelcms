@@ -18,7 +18,7 @@ Route::group([
     Route::get('/content/{urltitle}', 'ContentController@index');
     Route::get('/search', 'SearchController@index');
     Route::get('/tags/index', 'TagsController@index');
-    Route::get('/tags/{tag}', 'TagsController@info');
+    Route::get('/tag/{tag}', 'TagsController@info');
 });
 
 Route::group([
