@@ -19,6 +19,8 @@ Route::group([
     Route::get('/search', 'SearchController@index');
     Route::get('/tags/index', 'TagsController@index');
     Route::get('/tag/{tag}', 'TagsController@info');
+    Route::get('/form/index/{no}', 'FormController@index');
+    Route::post('/form/add', 'FormController@add');
 });
 
 Route::group([

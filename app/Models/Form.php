@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * App\Models\Form
+ * App\Models\FormController
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Form newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Form newQuery()
@@ -63,7 +63,7 @@ class Form extends BaseModel
         'display',
         'page',
         'tpl',
-        'where',
+        'condition',
         'return_type',
         'return_msg',
         'return_url',

@@ -263,11 +263,11 @@ class Category extends BaseModel
         $column = null,
         $operator = null,
         $value = null,
-        string $boolean = 'and',
-        int $limit = null,
-        int $offset = null,
-        string $orderBy = null,
-        array $columns = ['*']
+        $boolean = 'and',
+        $limit = null,
+        $offset = null,
+        $orderBy = null,
+        $columns = ['*']
     ) {
         $query = static::query()->where('is_show', 1);
         if (!is_null($column)) {

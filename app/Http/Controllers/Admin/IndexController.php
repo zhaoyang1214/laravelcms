@@ -39,7 +39,7 @@ class IndexController extends Controller
     public function cleanCache(Request $request)
     {
         $type = $request->post('type', 0);
-        switch ($type) {
+        switch (intval($type)) {
             case 0:
             case 1:
                 Artisan::call('cache:clear');

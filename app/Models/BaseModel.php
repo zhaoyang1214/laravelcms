@@ -219,13 +219,13 @@ class BaseModel extends Model
         $column = null,
         $operator = null,
         $value = null,
-        string $boolean = 'and',
-        int $limit = null,
-        int $offset = null,
-        string $orderBy = null,
-        bool $cache = true,
+        $boolean = 'and',
+        $limit = null,
+        $offset = null,
+        $orderBy = null,
+        $cache = true,
         $ttl = 7200,
-        array $columns = ['*']
+        $columns = ['*']
     ) {
         $query = static::query();
         if (!is_null($column)) {
@@ -271,11 +271,11 @@ class BaseModel extends Model
         $column = null,
         $operator = null,
         $value = null,
-        string $boolean = 'and',
-        int $limit = null,
-        int $offset = null,
-        string $orderBy = null,
-        array $columns = ['*']
+        $boolean = 'and',
+        $limit = null,
+        $offset = null,
+        $orderBy = null,
+        $columns = ['*']
     ) {
         $cacheSwitch = (bool)config('system.db_cache');
         $ttl = intval(config('system.db_cache_time')) / 60;

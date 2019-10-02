@@ -59,7 +59,7 @@
     			<div class="layui-input-inline input-large">
     				<input type="text" id="return_url" name="return_url" value="@isset($info){{ $info->return_url }}@endisset" autocomplete="off" class="layui-input">
     			</div>
-    			<div class="layui-form-mid layui-word-aux">表单提交成功后返回的消息(留空返回当前表单)</div>
+    			<div class="layui-form-mid layui-word-aux">表单提交成功后返回的地址(留空返回当前表单)</div>
     		</div>
     		<div class="layui-form-item">
     			<label for="page1" class="layui-form-label form-label-medium">前台分页数</label>
