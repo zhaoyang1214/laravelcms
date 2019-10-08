@@ -29,4 +29,23 @@ class HomeController extends BaseController
             'description' => $description
         ];
     }
+
+    /**
+     * 功能：弹出消息提示
+     * 修改日期：2019/10/4
+     *
+     * @param string $message
+     * @param string|bool|null $jumpUrl
+     * @return bool|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    protected function alert(string $message, $jumpUrl = null)
+    {
+        if (is_null($jumpUrl)) {
+            return '<script>alert("' . $message .'");window.history.go(-1);</script>';
+        } elseif ($jumpUrl === false) {
+            return '<script>alert("' . $message .'");</script>';
+        } else {
+            return '<script>alert("' . $message .'");window.location.href ="' . $jumpUrl . '"</script>';
+        }
+    }
 }
