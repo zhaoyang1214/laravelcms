@@ -26,7 +26,7 @@
 			<tr>
 				<td>{{ $loop->iteration }}</td>
 				@foreach ($formFieldList as $formField)
-				<td>{{ $formField->getFieldValue($formData) }}</td>
+				<td>{!! $formField->getFieldValue($formData) !!}</td>
 				@endforeach
 				<td>
 					@if($formdataInfoPower)
