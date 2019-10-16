@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\HomeController;
 use App\Models\BaseModel;
+use App\Models\FormData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,7 +21,7 @@ class IndexController extends HomeController
             }
         }
         $view = "home.{$systemConfig['theme']}.{$systemConfig['index_tpl']}";
-        $common = $this->media();
+        $common = $this->media('首页');
         $model = new BaseModel();
         $html = view($view, compact('common', 'model'))->render();
         if ($systemConfig['view_cache']) {

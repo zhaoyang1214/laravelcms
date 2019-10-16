@@ -27,7 +27,7 @@ class FormData extends BaseModel
         if (! isset($this->table)) {
             if (isset(self::$_table)) {
                 $this->table = 'form_data_' . self::$_table;
-            } else if (is_string($table)) {
+            } elseif (is_string($table)) {
                 self::$_table = $table;
                 $this->table = 'form_data_' . self::$_table;
             }
@@ -149,5 +149,53 @@ class FormData extends BaseModel
     {
         self::$_table = $tableName;
         return $this;
+    }
+
+    public function getAllByTableName(
+        string $tableName,
+        $column = null,
+        $operator = null,
+        $value = null,
+        $boolean = 'and',
+        $limit = null,
+        $offset = null,
+        $orderBy = null,
+        $columns = ['*']
+    ) {
+        $form = Form::getInfoCache('table', $tableName);
+        if (empty($form)) {
+            return false;
+        }
+        self::setTableName($tableName);
+        $orderBy = $orderBy ?? $form->sort;
+        return self::getListCache($column, $operator, $value, $boolean, $limit, $offset, $orderBy, $columns);
+    }
+
+    public function getAllFormat(
+        string $tableName,
+        $column = null,
+        $operator = null,
+        $value = null,
+        $boolean = 'and',
+        $limit = null,
+        $offset = null,
+        $orderBy = null,
+        $columns = ['*']
+    ) {
+        $form = Form::getInfoCache('table', $tableName);
+        if (empty($form)) {
+            return false;
+        }
+        $formFieldList = $this->cacheGet(FormField::where('form_id', $form->id)->orderBy('sequence'));
+        $formDatalist = self::getAllByTableName($tableName, $column, $operator, $value, $boolean, $limit, $offset, $orderBy, $columns);
+        $list = [];
+        foreach ($formDatalist as $formData) {
+            $data = [];
+            foreach ($formFieldList as $formField) {
+                $data[$formField->field] = $formField->getFieldValue($formData);
+            }
+            $list[] = $data;
+        }
+        return $list;
     }
 }

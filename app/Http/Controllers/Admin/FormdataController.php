@@ -20,15 +20,7 @@ class FormdataController extends Controller
         }
         $formData = new FormData($formInfo->table);
         if (! empty($formInfo->sort)) {
-            $sortArr = explode(',', $formInfo->sort);
-            foreach ($sortArr as $sort) {
-                $sort = explode(' ', $sort);
-                if (isset($sort[1]) && $sort[1] == 'desc') {
-                    $formData->orderByDesc($sort[0]);
-                } else {
-                    $formData->orderBy($sort[0]);
-                }
-            }
+            $formData = $formData::orderByRaw($formInfo->sort);
         }
         $data = $formData->paginate(10);
         $formFieldList = FormField::where('form_id', $formInfo->id)->where('admin_display', 1)->get();

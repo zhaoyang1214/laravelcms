@@ -303,7 +303,8 @@ class FormField extends BaseModel
                                  	laydate.render({
                                  	   elem: '#{$this->field}',
                                   	   type: '$laydateType',
-                                  	   format: "$laydateFormat"
+                                  	   format: "$laydateFormat",
+                                  	   trigger: 'click'
                                  	});
                         		});		
                         	</script>
