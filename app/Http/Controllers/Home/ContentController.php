@@ -69,7 +69,7 @@ class ContentController extends HomeController
         $collection = new Collection($contentArr);
         $perPage = 1;
         $contents = $collection->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        $contentStr = $contents[0];
+        $contentStr = $contents[$currentPage-1];
         if (!empty($contentStr)) {
             $replace = new Replace();
             $contentStr = $replace->replaceContent($contentStr);
@@ -79,7 +79,7 @@ class ContentController extends HomeController
         }
         $content->content = $contentStr;
         $paginator= new LengthAwarePaginator($contents, count($collection), $perPage, $currentPage);
-        $paginator->setPath($url);
+        $paginator->setPath(preg_replace('/\??&?page=\d*&?/', '', $url));
         $prevContent = $content->getPrevContent($content, $category);
         $nextContent = $content->getNextContent($content, $category);
         $nav = $category->getParents($category->id);

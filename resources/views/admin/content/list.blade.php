@@ -62,7 +62,13 @@
 				</td>
 				<td><center>{{ $data->id }}</center></td>
 				<td>
-					<span><a href="//{{ config('system.siteurl') }}/content/{{ $data->urltitle }}" target="_blank">{{ $data->title }}</a></span>
+					<span>
+						<a href="//{{ config('system.siteurl') }}/content/{{ $data->urltitle }}" target="_blank">{{ $data->title }}</a>
+						@if (!empty($data->image))
+						<a href="javascript:void(0);" rel="{{ $data->image }}" class="class_pic">
+						<img align="AbsMiddle" src="/admin/images/ico/pic.png" width="14" height="14" alt="" /></a>
+						@endif
+					</span>
 					@if (!empty($data->position))
 						@foreach (explode(',', $data->position) as $value)
 						<font color="red">[{{ $positionList[$value]['name'] }}]</font>
@@ -91,6 +97,10 @@
 	<div id="page"></div>
 </div>
 <script>
+//缩略图
+$(".class_pic").powerFloat({
+	targetMode: "ajax"
+});
 //快速编辑
 $('tr').hover(
 	function () {

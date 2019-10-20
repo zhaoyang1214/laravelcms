@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Overtrue\Pinyin\Pinyin;
 
@@ -230,7 +231,7 @@ class Content extends BaseModel
         $this->parseOrder($order, $query);
         $cacheSwitch = (bool)config('system.db_cache');
         if ($cacheSwitch) {
-            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, 'getContentList']);
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, Paginator::resolveCurrentPage('page'), 'getContentList']);
             if (Cache::has($key)) {
                 return Cache::get($key);
             }
@@ -474,20 +475,20 @@ class Content extends BaseModel
      * 功能：根据栏目id获取内容
      * 修改日期：2019/9/19
      *
-     * @param int $categoryId
+     * @param int|array $categoryId
      * @param int $listRows
      * @param int|string $order eg 1 or a.update_time desc
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|LengthAwarePaginator|mixed
      */
-    public function getListByCategoryId(int $categoryId, int $listRows = 10, $order = null)
+    public function getListByCategoryId($categoryId, int $listRows = 10, $order = null)
     {
         $category = Category::getInfoCache($categoryId);
         if (!$category) {
             return new LengthAwarePaginator([], 0, 1);
         }
         $order = $order ?? intval($category->content_order);
-        return self::getContentList([$categoryId], $listRows, $category->expand_id, $order);
+        return self::getContentList((array)$categoryId, $listRows, $category->expand_id, $order);
     }
 
     /**

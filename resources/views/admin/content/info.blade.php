@@ -16,7 +16,7 @@
         				<select name="category_id" id="category_id" lay-filter="category_id" style="width: 300px">
         					<option value="0">=====选择栏目=====</option>
         					@foreach($categoryList as $value)
-        					<option value="{{ $value['id'] }}" @if($value['type']==1 || $value['category_model_id'] != $category->category_model_id)disabled @endif @if(isset($info) && $info['category_id']==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
+        					<option value="{{ $value['id'] }}" @if($value['type']==1 || $value['category_model_id'] != $category->category_model_id)disabled @endif @if(isset($info) && $info['category_id']==$value['id'] || $category->id==$value['id'])selected @endif>{!! $value['cname'] !!}</option>
         					@endforeach
         				</select>
         			</div>

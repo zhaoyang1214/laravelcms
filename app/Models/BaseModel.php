@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -431,6 +432,7 @@ class BaseModel extends Model
         string $pageName = 'page',
         $page = null
     ) {
+        $page = $page ?? Paginator::resolveCurrentPage($pageName);
         return $this->cacheQuery($instance, 'paginate', $perPage, $columns, $pageName, $page);
     }
 }
