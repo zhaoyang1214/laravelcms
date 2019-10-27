@@ -1,1 +1,1 @@
-## 这是一个正在开发的laravelCMS
+## laravelCMS开发完成，具体使用见demo分支
