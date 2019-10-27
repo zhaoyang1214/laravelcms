@@ -85,7 +85,6 @@ class CategoryController extends HomeController
             if ($category->type == 1) {
                 $categorySons = $category->getSons($category->id);
                 $categoryIds = array_column($categorySons, 'id');
-                $categoryIds[] = $category->id;
             } else {
                 $categoryIds = [$category->id];
             }

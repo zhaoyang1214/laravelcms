@@ -148,6 +148,7 @@ class FormData extends BaseModel
     public function setTableName($tableName)
     {
         self::$_table = $tableName;
+        $this->table = 'form_data_' . self::$_table;
         return $this;
     }
 

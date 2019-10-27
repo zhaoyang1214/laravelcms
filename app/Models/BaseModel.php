@@ -312,14 +312,15 @@ class BaseModel extends Model
      * 修改日期：2019/8/7
      *
      * @param string $modelName
+     * @param mixed $init
      * @return bool
      */
-    public function getModel(string $modelName)
+    public function getModel(string $modelName, ...$init)
     {
         self::$tableName = null;
         $class = 'App\\Models\\' . ucfirst($modelName);
         if (class_exists($class)) {
-            return new $class();
+            return new $class(...$init);
         }
         return false;
     }

@@ -12,6 +12,7 @@
 		<thead>
 			<tr>
 				<th>序号</th>
+				<th>ID</th>
 				<th>名称</th>
 				<th>表名</th>
 				<th>顺序</th>
@@ -22,6 +23,7 @@
 			@foreach ($datas as $data)
 			<tr>
 				<td>{{ $loop->iteration }}</td>
+				<td>{{ $data->id }}</td>
 				<td>{{ $data->name }}</td>
 				<td>{{ $data->table }}</td>
 				<td>{{ $data->sequence }}</td>

@@ -43,6 +43,9 @@ class AddRequest extends Request
                     'required',
                     'between:2,50',
                     function ($attrbute, $value, $fail) {
+                        if (in_array($value, ['id'])) {
+                            return $fail('该字段名称已存在');
+                        }
                         $formField = FormField::where('form_id', $this->post('form_id'))->Where('name', $value);
                         $id = $this->post('id', 0);
                         if (! empty($id)) {
@@ -77,7 +80,7 @@ class AddRequest extends Request
                         return $fail('配置错误');
                     }
                 },
-                'regex' => 'regex:/^\/.*\/$/',
+                'regex' => 'regex:/^\/.*\/[a-z]*$/i',
                 'admin_display_len' => 'required|integer|digits_between:0,65535'
             ];
         }

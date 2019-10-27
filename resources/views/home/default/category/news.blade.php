@@ -17,7 +17,7 @@
                     <dd>
                         <h3><a href="{{$content['url']}}">{{$content['title']}}</a></h3>
                         <span>{{date('Y-m-d', strtotime($content['update_time']))}}</span>
-                        <p style="overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;">{{$content['description']}}</p>
+                        <p class="text_overflow3">{{$content['description']}}</p>
                         <a href="{{$content['url']}}" class="a1"><img src="/home/default/img/j3.png" />&nbsp;更多</a>
                     </dd>
                 </dl>

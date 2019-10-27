@@ -51,7 +51,7 @@ class CreateFormFieldTable extends Migration
             $table->tinyInteger('is_index')
                 ->default(0)
                 ->comment('是否添加普通索引，0：否，1：是');
-            $table->string('regex', 50)
+            $table->string('regex', 250)
                 ->default('')
                 ->comment('正则表达式验证');
             $table->tinyInteger('admin_display')

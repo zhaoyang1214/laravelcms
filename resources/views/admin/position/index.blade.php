@@ -11,7 +11,7 @@
 	<table class="layui-table">
 		<thead>
 			<tr>
-				<th width="10%">序号</th>
+				<th width="10%">ID</th>
 				<th width="40%">名称</th>
 				<th width="30%">顺序</th>
 				<th>操作</th>
@@ -20,7 +20,7 @@
 		<tbody>
 			@foreach ($datas as $data)
 			<tr>
-				<td>{{ $loop->iteration }}</td>
+				<td>{{ $data->id }}</td>
 				<td>{{ $data->name }}</td>
 				<td>{{ $data->sequence }}</td>
 				<td>

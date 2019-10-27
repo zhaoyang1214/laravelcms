@@ -235,3 +235,7 @@ textarea{resize:none;}/*取消textarea的拖动改变大小的功*/
 .footer1 a{color:#fff;padding-right:10px;}
 .footer-left p{ padding:3px 0}
 .footer-right{ margin-top:55px;}
+
+.text_overflow1{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;}
+.text_overflow2{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;}
+.text_overflow3{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 3;}

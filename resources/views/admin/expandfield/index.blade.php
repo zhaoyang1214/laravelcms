@@ -20,7 +20,7 @@
 				<th>字段类型</th>
 				<th>字段属性</th>
 				<th>字段顺序</th>
-				<th>后台列表显示</th>
+				<th>是否必填</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -33,7 +33,7 @@
 				<td>{{ $expandField->getTypeProperty($data->type, false) }}</td>
 				<td>{{ $expandField->getTypeProperty($data->type, $data->property) }}</td>
 				<td>{{ $data->sequence }}</td>
-				<td>@if($data->admin_display) 是 @else 否  @endif</td>
+				<td>@if($data->is_must) 是 @else 否  @endif</td>
 				<td>
 					@if($expandfieldInfoPower)
 					<a class="layui-btn layui-btn-normal layui-btn-xs" onclick="x_admin_show('查看扩展模型字段','/admin/expandfield/info/{{ $data->id }}', 850)"><i class="layui-icon layui-icon-edit"></i>查看</a>

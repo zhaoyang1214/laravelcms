@@ -42,7 +42,7 @@ class FormfieldController extends Controller
             }
             return response()->json([
                 'status' => 10001,
-                'message' => '添加失败'
+                'message' => $formField->getMessages()[0]['message'] ?? '添加失败'
             ]);
         }
         $typeProperty = $formField->getTypeProperty();

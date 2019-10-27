@@ -98,7 +98,7 @@ class Content extends BaseModel
             $data['urltitle'] = $urltitle;
         }
         if (self::where('urltitle', $data['urltitle'])->count()) {
-            return $this->appendMessage('该内容url已存在');
+            return $this->appendMessage('英文URL名称');
         }
         $nowDate = date('Y-m-d H:i:s');
         if (empty($data['update_time'])) {
@@ -206,17 +206,47 @@ class Content extends BaseModel
      * @param int $listRows
      * @param int $expandId
      * @param int|string $order eg 1 or a.update_time desc
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public function getContentList(array $categoryIds, int $listRows, int $expandId = 0, $order = 1)
+    public function getContentList(array $categoryIds, int $listRows, int $expandId = 0, $order = 1, string $pageName = 'page', $page = null)
+    {
+        $query = $this->getListQuery($categoryIds, $expandId, $order);
+        $cacheSwitch = (bool)config('system.db_cache');
+        if ($cacheSwitch) {
+            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, Paginator::resolveCurrentPage($pageName), 'getContentList']);
+            if (Cache::has($key)) {
+                return Cache::get($key);
+            }
+        }
+        $list = $query->paginate($listRows, ['*'], $pageName, $page);
+        if ($cacheSwitch) {
+            $ttl = intval(config('system.db_cache_time')) / 60;
+            Cache::set($key, $list, $ttl);
+        }
+        return $list;
+    }
+
+    /**
+     * 功能：获取内容列表查询
+     * 修改日期：2019/8/21
+     *
+     * @param array $categoryIds
+     * @param int $expandId
+     * @param int|string $order eg 1 or a.update_time desc
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function getListQuery(array $categoryIds, int $expandId = 0, $order = 1)
     {
         $dbPrefix = env('DB_PREFIX');
         $query = static::from('content as a')->leftJoin('category as b', 'a.category_id', 'b.id');
         $columns = ['a.*', 'b.name as category_name', 'b.subname as category_subname', 'b.category_model_id'];
         if ($expandId) {
             $expand = Expand::getInfoCache($expandId);
-            $expandDataTable = (new ExpandData($expand->table))->getTable();
+            $expandDataTable = (new ExpandData())->setTableName($expand->table)->getTable();
             $expandFieldList = ExpandField::getListCache('expand_id', $expandId)->toArray();
             $expandFields = array_column($expandFieldList, 'field');
             foreach ($expandFields as $expandField) {
@@ -229,19 +259,7 @@ class Content extends BaseModel
             ->whereIn('a.category_id', $categoryIds)
             ->where('a.status', 1);
         $this->parseOrder($order, $query);
-        $cacheSwitch = (bool)config('system.db_cache');
-        if ($cacheSwitch) {
-            $key = self::createCacheKey([$query->toSql(), $query->getBindings(), $listRows, Paginator::resolveCurrentPage('page'), 'getContentList']);
-            if (Cache::has($key)) {
-                return Cache::get($key);
-            }
-        }
-        $list = $query->paginate($listRows);
-        if ($cacheSwitch) {
-            $ttl = intval(config('system.db_cache_time')) / 60;
-            Cache::set($key, $list, $ttl);
-        }
-        return $list;
+        return $query;
     }
 
     /**
@@ -475,20 +493,34 @@ class Content extends BaseModel
      * 功能：根据栏目id获取内容
      * 修改日期：2019/9/19
      *
-     * @param int|array $categoryId
+     * @param int|array $categoryIds
      * @param int $listRows
      * @param int|string $order eg 1 or a.update_time desc
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|LengthAwarePaginator|mixed
      */
-    public function getListByCategoryId($categoryId, int $listRows = 10, $order = null)
+    public function getListByCategoryId($categoryIds, int $listRows = null, $order = null, string $pageName = 'nopage', $page = null)
     {
-        $category = Category::getInfoCache($categoryId);
-        if (!$category) {
-            return new LengthAwarePaginator([], 0, 1);
+        $expandId = 0;
+        if (is_int($categoryIds)) {
+            $category = Category::getInfoCache($categoryIds);
+            if (!$category) {
+                return new LengthAwarePaginator([], 0, 1);
+            }
+            if ($category->type == 1) {
+                $categorySons = $category->getSons($category->id);
+                $categoryIds = array_column($categorySons, 'id');
+            } else {
+                $categoryIds = [$category->id];
+                $listRows = $listRows ?? intval($category->page);
+                $order = $order ?? intval($category->content_order);
+            }
+            $expandId = $category->expand_id;
         }
-        $order = $order ?? intval($category->content_order);
-        return self::getContentList((array)$categoryId, $listRows, $category->expand_id, $order);
+
+        return self::getContentList($categoryIds, $listRows ?? 10, $expandId, $order, $pageName, $page);
     }
 
     /**
@@ -500,6 +532,8 @@ class Content extends BaseModel
      * @param null|array|string $categoryIds
      * @param bool $categorySon
      * @param null|int|string $order
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
@@ -508,7 +542,9 @@ class Content extends BaseModel
         int $listRows = 10,
         $categoryIds = null,
         bool $categorySon = false,
-        $order = null
+        $order = null,
+        string $pageName = 'nopage',
+        $page = null
     ) {
         if (!is_array($tagsIds)) {
             $tagsIds = explode(',', $tagsIds);
@@ -548,7 +584,7 @@ class Content extends BaseModel
                 return Cache::get($key);
             }
         }
-        $list = $query->paginate($listRows);
+        $list = $query->paginate($listRows, ['*'], $pageName, $page);
         if ($cacheSwitch) {
             $ttl = intval(config('system.db_cache_time')) / 60;
             Cache::set($key, $list, $ttl);
@@ -565,6 +601,8 @@ class Content extends BaseModel
      * @param null|array|string $categoryIds
      * @param bool $categorySon
      * @param null|int|string $order
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
@@ -573,7 +611,9 @@ class Content extends BaseModel
         int $listRows = 10,
         $categoryIds = null,
         bool $categorySon = false,
-        $order = null
+        $order = null,
+        $pageName = 'nopage',
+        $page = null
     ) {
         if (!is_array($positionIds)) {
             $positionIds = explode(',', $positionIds);
@@ -613,7 +653,7 @@ class Content extends BaseModel
                 return Cache::get($key);
             }
         }
-        $list = $query->paginate($listRows);
+        $list = $query->paginate($listRows, ['*'], $pageName, $page);
         if ($cacheSwitch) {
             $ttl = intval(config('system.db_cache_time')) / 60;
             Cache::set($key, $list, $ttl);
@@ -630,6 +670,8 @@ class Content extends BaseModel
      * @param null|array|string $categoryIds
      * @param bool $categorySon
      * @param null|int|string $order
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
@@ -638,7 +680,9 @@ class Content extends BaseModel
         int $listRows = 10,
         $categoryIds = null,
         bool $categorySon = false,
-        $order = null
+        $order = null,
+        $pageName = 'nopage',
+        $page = null
     ) {
         if (!is_array($tagsGroupIds)) {
             $tagsGroupIds = explode(',', $tagsGroupIds);
@@ -679,7 +723,7 @@ class Content extends BaseModel
                 return Cache::get($key);
             }
         }
-        $list = $query->paginate($listRows);
+        $list = $query->paginate($listRows, ['*'], $pageName, $page);
         if ($cacheSwitch) {
             $ttl = intval(config('system.db_cache_time')) / 60;
             Cache::set($key, $list, $ttl);
@@ -695,11 +739,19 @@ class Content extends BaseModel
      * @param int $type
      * @param array|null $categoryIds
      * @param int $listRows
+     * @param string $pageName
+     * @param int|null $page
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public function getListBySearch($keywords, int $type = 0, array $categoryIds = null, int $listRows = 10)
-    {
+    public function getListBySearch(
+        $keywords,
+        int $type = 0,
+        array $categoryIds = null,
+        int $listRows = 10,
+        $pageName = 'page',
+        $page = null
+    ) {
         if (!is_array($keywords)) {
             $keywords = explode(' ', $keywords);
         }
@@ -745,7 +797,7 @@ class Content extends BaseModel
                 return Cache::get($key);
             }
         }
-        $list = $query->paginate($listRows);
+        $list = $query->paginate($listRows, ['*'], $pageName, $page);
         if ($cacheSwitch) {
             $ttl = intval(config('system.db_cache_time')) / 60;
             Cache::set($key, $list, $ttl);

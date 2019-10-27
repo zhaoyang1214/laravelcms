@@ -111,8 +111,8 @@
 				<th width="20px"><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></th>
 				<th width="40"><center>ID</center></th>
                 <th width="">标题</th>
-                <th width="">栏目</th>
                 <th width="40"><center>审核</center></th>
+                <th width="50">访问量</th>
                 <th width="130"><center>更新时间</center></th>
                 <th width="120"><center>操作</center></th>
 			</tr>
@@ -141,9 +141,9 @@
 					<a class="layui-btn layui-btn-normal layui-btn-xs quickeditor" style=" display:none" onclick="x_admin_show('快速编辑','/admin/content/quickEdit/{{ $data->id }}', 850)">[快速编辑]</a>
 					@endif
 				</td>
-				<td><a href="//">{{ $data->category_name }}</a></td>
 				<td><center>@if($data->status==1)<font color=green><b>√</b></font>@else<font color=red><b>×</b></font>@endif</center>
-				</td>
+                <td><a href="//">{{ $data->views }}</a></td>
+                </td>
 				<td><center>{{ $data->update_time }}</center></td>
 				<td>
 					@if($contentInfoPower)

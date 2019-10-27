@@ -161,7 +161,13 @@ class ExpandField extends BaseModel
     {
         try {
             $expand = Expand::find($data['expand_id']);
-            Schema::table('expand_data_' . $expand->table, function (Blueprint $table) use ($data) {
+            $tableName = 'expand_data_' . $expand->table;
+            Schema::table($tableName, function (Blueprint $table) use ($data, $tableName) {
+                if (Schema::hasColumn($tableName, $data['field'])) {
+                    $table->dropColumn($data['field']);
+                }
+            });
+            Schema::table($tableName, function (Blueprint $table) use ($data) {
                 switch ($data['property']) {
                     case 1:
                         $fieldObj = $table->string($data['field'], $data['len']);
@@ -537,7 +543,22 @@ EOF;
         return $value;
     }
 
-    public function getFieldValue2($expandFieldList, string $fieldName, $value) {
-
+    /**
+     * 功能：获取单个字段格式化值
+     * 修改日期：2019/10/26
+     *
+     * @param \Illuminate\Database\Eloquent\Collection|static[] $expandFieldList
+     * @param string $fieldName
+     * @param $value
+     * @return mixed
+     */
+    public function getFieldValue2($expandFieldList, string $fieldName, $value)
+    {
+        foreach ($expandFieldList as $expandField) {
+            if ($expandField->field == $fieldName) {
+                return $expandField->getFieldValue([$fieldName => $value]);
+            }
+        }
+        return null;
     }
 }

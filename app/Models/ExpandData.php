@@ -37,6 +37,13 @@ class ExpandData extends BaseModel
         }
     }
 
+    public function setTableName($tableName)
+    {
+        self::$_table = $tableName;
+        $this->table = 'expand_data_' . self::$_table;
+        return $this;
+    }
+
     public function checkData(array $data, int $expandId)
     {
         $expandFieldList = ExpandField::where('expand_id', $expandId)->orderBy('sequence')->get();

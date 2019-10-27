@@ -252,12 +252,12 @@ class ContentController extends Controller
                 DB::beginTransaction();
                 $data = $request->post();
                 unset($data['content'], $data['_token']);
-                $content = new Content();
-                $content = $content->add($data);
+                $contentModel = new Content();
+                $content = $contentModel->add($data);
                 if (! $content) {
                     return response()->json([
                         'status' => 10001,
-                        'message' => '添加失败'
+                        'message' => $contentModel->getMessages()[0]['message'] ?? '添加失败'
                     ]);
                 }
                 $contentId = $content->id;

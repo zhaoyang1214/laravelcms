@@ -38,25 +38,18 @@
         </div>
         <div class="weix1">
             <ul>
+                @foreach($model->getModel('content')->getListByCategoryId(10, 3, 1) as $v)
                 <li>
-                    <a href="#">郑佩佩主演赖声川话剧话剧郑佩佩主演赖声川话剧话剧</a>
-                    <h5>2016-07-18</h5>
+                    <a class="text_overflow2" href="{{$v->url}}">{{$v->title}}</a>
+                    <h5>{{date('Y-m-d', strtotime($v->update_time))}}</h5>
                 </li>
-                <li>
-                    <a href="#">郑佩佩主演赖声川话剧话剧郑佩佩主演赖声川话剧话剧</a>
-                    <h5>2016-07-18</h5>
-                </li>
-                <li>
-                    <a href="#">郑佩佩主演赖声川话剧话剧郑佩佩主演赖声川话剧话剧</a>
-                    <h5>2016-07-18</h5>
-                </li>
+                @endforeach
             </ul>
         </div>
     </div>
     <!--end-->
 </div>
 <!--end-->
-
 
 <!--内容-->
 <div class="clear"></div>
@@ -66,184 +59,81 @@
         <div class="slideTxtBox">
             <div class="hd">
                 <ul>
-                    <li><a href="#">热门演出</a></li>
-                    <li><a href="#">节目预告</a></li>
-                    <li><a href="#">节目单</a></li>
+                    <li><a>热门演出</a></li>
+                    <li><a>节目预告</a></li>
+                    <li><a>节目单</a></li>
                 </ul>
             </div>
             <div class="bd">
                 <ul class="tp0 overflow">
-                    <li>
+                    @foreach($model->getModel('content')->getListByPositions(1, 6, [12, 13], true) as $content)
+                    <li @if($loop->iteration % 3 == 0) class="last" @endif>
                         <div class="tp">
-                            <img src="/home/default/img/pic5.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
+                            <a href="{{$content['url']}}">
+                                <img src="{{$content['image']}}" />
+                                <div class="txt">
+                                    <h3>{{$content['title']}}</h3>
+                                </div>
+                            </a>
                         </div>
+                        @php($expandData = $model->getModel('expandData')->setTableName('program')->getInfoCache('content_id', $content['id']))
+                        @php($showTime = explode("\n", $expandData->show_time))
+                        @php($fares = explode("\n", $expandData->fares))
                         <div class="tp1">
-                            <h5>8月15</h5>
+                            <h5>{{$showTime[0]}}</h5>
                             <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
+                                <span class="fl">票价：{{min($fares)}}@if(count($fares) > 1)-{{max($fares)}}@endif元</span>
+                                <a href="{{$expandData->booking}}" class="fr">订票</a>
                             </div>
                         </div>
                     </li>
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="last">
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
+                    @endforeach
                 </ul>
                 <ul class="tp0 overflow">
-                    <li>
+                    @foreach($model->cacheGet($model->getModel('content')->getListQuery([12, 14, 15, 16], 2)->where('c.program_type', 2)) as $content)
+                    <li @if($loop->iteration % 3 == 0) class="last" @endif>
                         <div class="tp">
-                            <img src="/home/default/img/pic5.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
+                            <a href="{{$content->url}}">
+                                <img src="{{$content->image}}" />
+                                <div class="txt">
+                                    <h3>{{$content->title}}</h3>
+                                </div>
+                            </a>
                         </div>
+                        @php($showTime = explode("\n", $content->show_time))
+                        @php($fares = explode("\n", $content->fares))
                         <div class="tp1">
-                            <h5>8月15</h5>
+                            <h5>{{$showTime[0]}}</h5>
                             <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
+                                <span class="fl">票价：{{min($fares)}}@if(count($fares) > 1)-{{max($fares)}}@endif元</span>
+                                <a href="{{$expandData->booking}}" class="fr">订票</a>
                             </div>
                         </div>
                     </li>
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="last">
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-
+                    @endforeach
                 </ul>
                 <ul class="tp0 overflow">
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic5.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
+                    @foreach($model->cacheGet($model->getModel('content')->getListQuery([12, 14, 15, 16], 2)->where('c.program_type', 1)) as $content)
+                        <li @if($loop->iteration % 3 == 0) class="last" @endif>
+                            <div class="tp">
+                                <a href="{{$content->url}}">
+                                    <img src="{{$content->image}}" />
+                                    <div class="txt">
+                                        <h3>{{$content->title}}</h3>
+                                    </div>
+                                </a>
                             </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
+                            @php($showTime = explode("\n", $content->show_time))
+                            @php($fares = explode("\n", $content->fares))
+                            <div class="tp1">
+                                <h5>{{$showTime[0]}}</h5>
+                                <div class="tp2">
+                                    <span class="fl">票价：{{min($fares)}}@if(count($fares) > 1)-{{max($fares)}}@endif元</span>
+                                    <a href="{{$expandData->booking}}" class="fr">订票</a>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="last">
-                        <div class="tp">
-                            <img src="/home/default/img/pic6.jpg" />
-                            <div class="txt">
-                                <h3>荒诞喜剧《劫出人生》</h3>
-                            </div>
-                        </div>
-                        <div class="tp1">
-                            <h5>8月15</h5>
-                            <div class="tp2">
-                                <span class="fl">票价：60-400元</span>
-                                <a href="#" class="fr">订票</a>
-                            </div>
-                        </div>
-                    </li>
-
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         </div>

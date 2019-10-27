@@ -4,26 +4,14 @@
         <p>cooperation</p>
     </div>
     <div class="tab3">
+        @foreach($model->getModel('content')->getListByCategoryId(17, 3, 4) as $v)
         <dl>
-            <dt>合肥场地租赁</dt>
+            <dt>{{$v['site_name']}}</dt>
             <dd>
-                <p>负责人：望京</p>
-                <p>联系电话：15215569996</p>
+                <p>负责人：{{$v['leader']}}</p>
+                <p>联系电话：{{$v['tel']}}</p>
             </dd>
         </dl>
-        <dl>
-            <dt>合肥场地租赁</dt>
-            <dd>
-                <p>负责人：望京</p>
-                <p>联系电话：15215569996</p>
-            </dd>
-        </dl>
-        <dl>
-            <dt>合肥场地租赁</dt>
-            <dd>
-                <p>负责人：望京</p>
-                <p>联系电话：15215569996</p>
-            </dd>
-        </dl>
+        @endforeach
     </div>
 </div>

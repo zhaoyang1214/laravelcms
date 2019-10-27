@@ -167,7 +167,13 @@ class FormField extends BaseModel
     {
         try {
             $form = Form::find($data['form_id']);
-            Schema::table('form_data_' . $form->table, function (Blueprint $table) use ($data) {
+            $tableName = 'form_data_' . $form->table;
+            Schema::table($tableName, function (Blueprint $table) use ($data, $tableName) {
+                if (Schema::hasColumn($tableName, $data['field'])) {
+                    $table->dropColumn($data['field']);
+                }
+            });
+            Schema::table($tableName, function (Blueprint $table) use ($data) {
                 switch ($data['property']) {
                     case 1:
                         $fieldObj = $table->string($data['field'], $data['len']);

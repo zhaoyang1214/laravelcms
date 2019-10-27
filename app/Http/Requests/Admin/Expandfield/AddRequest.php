@@ -57,6 +57,9 @@ class AddRequest extends Request
                     'required',
                     'regex:/^[a-zA-Z]\w{1,20}$/',
                     function ($attrbute, $value, $fail) {
+                        if (in_array($value, ['id', 'content_id'])) {
+                            return $fail('该字段名称已存在');
+                        }
                         $expandField = ExpandField::where('expand_id', $this->post('expand_id'))->Where('field', $value);
                         $id = $this->post('id', 0);
                         if (! empty($id)) {
@@ -76,7 +79,7 @@ class AddRequest extends Request
                         return $fail('配置错误');
                     }
                 },
-                'regex' => 'regex:/^\/.*\/$/'
+                'regex' => 'regex:/^\/.*\/[a-z]*$/i'
             ];
         }
         return $rules;
